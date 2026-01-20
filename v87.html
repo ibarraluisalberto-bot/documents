@@ -1,0 +1,3607 @@
+Versión 87
+
+<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Ideas de Mejora</title>
+  <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            overflow-x: hidden;
+        }
+
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: #1a237e;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .hamburger {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .hamburger:hover {
+            transform: scale(1.1);
+        }
+
+        .topbar-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .topbar-logo {
+            max-height: 88px;
+            max-width: 200px;
+            object-fit: contain;
+            cursor: pointer;
+            display: none;
+        }
+
+        .topbar-logo.active {
+            display: block;
+        }
+
+        .topbar-title.hidden {
+            display: none;
+        }
+
+        .topbar-right {
+            color: white;
+            text-align: right;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .topbar-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            display: none;
+        }
+
+        .topbar-avatar.active {
+            display: block;
+        }
+
+        .topbar-user-info {
+            text-align: right;
+        }
+
+        .topbar-right .user-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .topbar-right .user-details {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 280px;
+            background: #1a237e;
+            z-index: 2000;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+            padding-top: 20px;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .menu {
+            list-style: none;
+            padding: 10px 0;
+        }
+
+        .menu-item {
+            color: white;
+        }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s;
+            user-select: none;
+        }
+
+        .menu-link:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .menu-link.has-submenu {
+            font-weight: 500;
+        }
+
+        .menu-arrow {
+            transition: transform 0.3s;
+            font-size: 12px;
+        }
+
+        .menu-arrow.rotated {
+            transform: rotate(90deg);
+        }
+
+        .submenu {
+            list-style: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .submenu.active {
+            max-height: 500px;
+        }
+
+        .submenu-link {
+            display: block;
+            padding: 12px 20px 12px 40px;
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+
+        .submenu-link:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .main-content {
+            margin-top: 64px;
+            padding: 30px;
+            min-height: calc(100vh - 64px);
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section h2 {
+            font-size: 28px;
+            color: #1a237e;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #1a237e;
+            padding-bottom: 10px;
+        }
+
+        .section p {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 800px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        .form-group input[type="text"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1a237e;
+        }
+
+        .form-group input[readonly] {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .file-upload-area {
+            position: relative;
+            border: 2px dashed #ddd;
+            border-radius: 4px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-upload-area:hover {
+            border-color: #1a237e;
+            background-color: #f8f9fa;
+        }
+
+        .file-upload-area input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-upload-text {
+            pointer-events: none;
+        }
+
+        .file-upload-text span {
+            display: block;
+            font-size: 16px;
+            color: #1a237e;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .file-upload-text small {
+            display: block;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .file-list {
+            margin-top: 15px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .file-item span {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .file-item button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .file-item button:hover {
+            background: #c0392b;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #1a237e;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0d1642;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        /* Estilos para la tabla */
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        /* Panel de filtros */
+        .filtros-panel {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .filtros-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filtros-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .filtro-grupo {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 180px;
+        }
+
+        .filtro-grupo.filtro-busqueda {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .filtro-grupo.filtro-fecha {
+            min-width: 160px;
+        }
+
+        .filtro-grupo label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .filtro-grupo select,
+        .filtro-grupo input[type="text"],
+        .filtro-grupo input[type="date"],
+        .filtro-grupo input[type="month"] {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: border-color 0.2s;
+        }
+
+        .filtro-grupo select:focus,
+        .filtro-grupo input[type="text"]:focus,
+        .filtro-grupo input[type="date"]:focus,
+        .filtro-grupo input[type="month"]:focus {
+            outline: none;
+            border-color: #1a237e;
+        }
+
+        .btn-limpiar-filtros {
+            padding: 8px 20px;
+            background: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+            margin-top: auto;
+        }
+
+        .btn-limpiar-filtros:hover {
+            background: #f57c00;
+        }
+
+        .contador-registros {
+            padding: 10px 0;
+            font-size: 14px;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 10px;
+        }
+
+        .contador-registros strong {
+            color: #1a237e;
+            font-weight: 700;
+        }
+
+        .tabla-ideas {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .tabla-ideas thead {
+            background: #1a237e;
+            color: white;
+        }
+
+        .tabla-ideas th {
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .tabla-ideas td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: top;
+        }
+
+        .tabla-ideas tbody tr:hover {
+            background: #f5f5f5;
+        }
+
+        .tabla-ideas td.descripcion-col,
+        .tabla-ideas td.situacion-col {
+            max-width: 200px;
+            word-wrap: break-word;
+        }
+
+        .estatus-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .estatus-abierto {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .estatus-cerrado {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .documentos-lista {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .documento-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .documento-item a {
+            color: #1a237e;
+            text-decoration: none;
+        }
+
+        .documento-item a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            color: #666;
+            font-size: 16px;
+            transition: color 0.2s;
+        }
+
+        .btn-icon:hover {
+            color: #1a237e;
+        }
+
+        .opciones-grupo {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-opcion {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-editar {
+            background: #2196f3;
+            color: white;
+        }
+
+        .btn-editar:hover {
+            background: #1976d2;
+        }
+
+        .btn-eliminar {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-eliminar:hover {
+            background: #d32f2f;
+        }
+
+        .mensaje-vacio {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 16px;
+            display: none;
+        }
+
+        .mensaje-vacio.visible {
+            display: block;
+        }
+
+        /* Estilos para columnas de fechas compactas */
+        .columna-fechas {
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .columna-fechas .fecha-linea {
+            display: block;
+            padding: 3px 0;
+        }
+
+        .columna-fechas .fecha-label {
+            font-weight: 600;
+            color: #1a237e;
+        }
+
+        .columna-fechas .fecha-valor {
+            color: #333;
+        }
+
+        .columna-fechas .separador {
+            display: block;
+            height: 1px;
+            background: #e0e0e0;
+            margin: 4px 0;
+        }
+
+        /* Modal de confirmación */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .modal-content p {
+            margin-bottom: 25px;
+            color: #666;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-small {
+            padding: 8px 20px;
+            font-size: 13px;
+        }
+
+        /* Estilos para Administrar Perfiles */
+        .perfiles-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tabla-perfiles-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 0 -30px;
+            padding: 0 30px;
+        }
+
+        .perfiles-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .perfiles-header h3 {
+            color: #1a237e;
+            font-size: 22px;
+        }
+
+        .btn-agregar-usuario {
+            background: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-agregar-usuario:hover {
+            background: #45a049;
+        }
+
+        .tabla-perfiles {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            min-width: 1200px;
+        }
+
+        .tabla-perfiles thead {
+            background: #1a237e;
+            color: white;
+        }
+
+        .tabla-perfiles th {
+            padding: 14px 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .tabla-perfiles td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: middle;
+        }
+
+        .tabla-perfiles tbody tr:hover {
+            background: #f5f5f5;
+        }
+
+        .perfil-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .perfil-master {
+            background: #ff5722;
+            color: white;
+        }
+
+        .perfil-administrador {
+            background: #2196f3;
+            color: white;
+        }
+
+        .perfil-gerente {
+            background: #ff9800;
+            color: white;
+        }
+
+        .perfil-colaborador {
+            background: #4caf50;
+            color: white;
+        }
+
+        .select-perfil {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .select-perfil:focus {
+            outline: none;
+            border-color: #1a237e;
+        }
+
+        .select-perfil:hover {
+            border-color: #1a237e;
+        }
+
+        .btn-guardar-perfil {
+            background: #1a237e;
+            color: white;
+            padding: 6px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-guardar-perfil:hover {
+            background: #0d1642;
+        }
+
+        .btn-guardar-perfil:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .acciones-perfil {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .info-permisos {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+
+        .info-permisos h4 {
+            color: #1565c0;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .info-permisos ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-permisos li {
+            padding: 5px 0;
+            color: #333;
+            font-size: 13px;
+        }
+
+        .info-permisos li:before {
+            content: "✓ ";
+            color: #4caf50;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .permisos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .permiso-card {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid #1a237e;
+        }
+
+        .permiso-card strong {
+            display: block;
+            color: #1a237e;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .permiso-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .permiso-card li {
+            padding: 3px 0;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .permiso-card li:before {
+            content: "• ";
+            color: #1a237e;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        /* Campo de comentario editable */
+        .comentario-editable {
+            width: 100%;
+            min-height: 60px;
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            resize: vertical;
+            transition: border-color 0.2s, background-color 0.2s;
+            background: white;
+        }
+
+        .comentario-editable:focus {
+            outline: none;
+            border-color: #1a237e;
+            background: #f8f9ff;
+        }
+
+        .comentario-editable:hover {
+            border-color: #1a237e;
+        }
+
+        .comentario-guardado {
+            background: #e8f5e9;
+            animation: flashGuardado 0.5s ease;
+        }
+
+        @keyframes flashGuardado {
+            0%, 100% { background: white; }
+            50% { background: #e8f5e9; }
+        }
+
+        /* Estilos para tarjetas de acciones */
+        .accion-card {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        .accion-card.completada {
+            background: #e8f5e9;
+            border-color: #4caf50;
+            opacity: 0.8;
+        }
+
+        .accion-card.bloqueada {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .accion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .accion-numero {
+            background: #1a237e;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .accion-estado {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .badge-estado {
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-pendiente {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-completada {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .accion-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .accion-campo {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .accion-campo label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .accion-campo .valor {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .accion-cumplimiento {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 2px solid #e0e0e0;
+            margin-bottom: 15px;
+        }
+
+        .accion-cumplimiento label {
+            display: block;
+            font-weight: 700;
+            color: #1a237e;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .radio-option:hover {
+            background: #f0f0f0;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .radio-option.si {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        .radio-option.no {
+            color: #c62828;
+            font-weight: 600;
+        }
+
+        .accion-observaciones {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            resize: vertical;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .accion-observaciones:focus {
+            outline: none;
+            border-color: #1a237e;
+            background: #f8f9ff;
+        }
+
+        .accion-observaciones:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        /* Modal para agregar usuario */
+        .modal-form {
+            max-width: 600px;
+        }
+
+        .modal-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        /* Modal de visualización */
+        .modal-visualizar {
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .detalle-idea {
+            margin-bottom: 20px;
+        }
+
+        .detalle-idea label {
+            display: block;
+            font-weight: 700;
+            color: #1a237e;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .detalle-idea .valor {
+            color: #333;
+            font-size: 14px;
+            line-height: 1.6;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 3px solid #1a237e;
+        }
+
+        @media (max-width: 768px) {
+            .topbar-title {
+                font-size: 16px;
+            }
+
+            .topbar-right {
+                font-size: 12px;
+            }
+
+            .topbar-right .user-details {
+                font-size: 10px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .section h2 {
+                font-size: 24px;
+            }
+
+            .form-container {
+                padding: 20px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .tabla-ideas {
+                font-size: 11px;
+            }
+
+            .tabla-ideas th,
+            .tabla-ideas td {
+                padding: 8px 5px;
+            }
+
+            .perfiles-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+
+            .tabla-perfiles {
+                font-size: 12px;
+            }
+
+            .permisos-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="topbar">
+   <div class="topbar-left"><button class="hamburger" id="hamburgerBtn">☰</button>
+    <div class="topbar-title" id="topbarTitle" title="Ir al Dashboard">
+     MejorISSA
+    </div><img src="" alt="Logo Portal" class="topbar-logo" id="topbarLogo" title="Ir al Dashboard">
+   </div>
+   <div class="topbar-right"><img src="" alt="Avatar" class="topbar-avatar" id="topbarAvatar">
+    <div class="topbar-user-info">
+     <div class="user-name">
+      LUIS ALBERTO IBARRA GONZALEZ
+     </div>
+     <div class="user-details">
+      Analista de Tecnologías | TECNOLOGÍAS DE INFORMACIÓN
+     </div>
+     <div class="user-details" style="margin-top: 2px;">
+      <span style="background: #ff5722; padding: 2px 8px; border-radius: 8px; font-weight: 700; font-size: 11px;">🔴 MASTER</span>
+     </div>
+    </div>
+   </div>
+  </div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <nav class="sidebar" id="sidebar">
+   <div class="sidebar-header">
+    Menú Principal
+   </div>
+   <ul class="menu">
+    <li class="menu-item">
+     <div class="menu-link has-submenu" data-toggle="submenu1"><span>Ideas de Mejora</span> <span class="menu-arrow">▶</span>
+     </div>
+     <ul class="submenu" id="submenu1">
+      <li><a class="submenu-link" data-section="registrar-ideas">Registrar</a></li>
+      <li><a class="submenu-link" data-section="ideas-registradas">Mis Ideas</a></li>
+      <li><a class="submenu-link" data-section="biblioteca" id="menuBiblioteca">Biblioteca</a></li>
+     </ul></li>
+    <li class="menu-item">
+     <div class="menu-link has-submenu" data-toggle="submenu2"><span>Implementación</span> <span class="menu-arrow">▶</span>
+     </div>
+     <ul class="submenu" id="submenu2">
+      <li><a class="submenu-link" data-section="seguimiento">Seguimiento</a></li>
+      <li><a class="submenu-link" data-section="agregar-acciones">Agregar Acciones</a></li>
+     </ul></li>
+    <li class="menu-item">
+     <div class="menu-link has-submenu" data-toggle="submenu3"><span>Agenda Electrónica</span> <span class="menu-arrow">▶</span>
+     </div>
+     <ul class="submenu" id="submenu3">
+      <li><a class="submenu-link" data-section="agenda">Agenda</a></li>
+     </ul></li>
+    <li class="menu-item">
+     <div class="menu-link has-submenu" data-toggle="submenu4"><span>Cronograma Prototipos/Liberaciones</span> <span class="menu-arrow">▶</span>
+     </div>
+     <ul class="submenu" id="submenu4">
+      <li><a class="submenu-link" data-section="cronograma">Ver Cronograma</a></li>
+     </ul></li>
+    <li class="menu-item"><a class="menu-link" data-section="dashboard"> <span>Dashboard</span> </a></li>
+    <li class="menu-item"><a class="menu-link" data-section="catalogos"> <span>Administrar Catálogos</span> </a></li>
+    <li class="menu-item">
+     <div class="menu-link has-submenu" data-toggle="submenu5"><span>Configuración</span> <span class="menu-arrow">▶</span>
+     </div>
+     <ul class="submenu" id="submenu5">
+      <li><a class="submenu-link" data-section="personalizacion">Personalización del Portal</a></li>
+      <li><a class="submenu-link" data-section="administrar-perfil">Administrar Perfiles</a></li>
+     </ul></li>
+    <li class="menu-item"><a class="menu-link" data-section="salir"> <span>Salir</span> </a></li>
+   </ul>
+  </nav><!-- Modal de confirmación de eliminación -->
+  <div class="modal-overlay" id="modalEliminar">
+   <div class="modal-content">
+    <h3>Confirmar Eliminación</h3>
+    <p>¿Está seguro que desea eliminar esta idea de mejora? Esta acción no se puede deshacer.</p>
+    <div class="modal-actions"><button class="btn btn-secondary btn-small" id="btnCancelarEliminar">Cancelar</button> <button class="btn btn-eliminar btn-small" id="btnConfirmarEliminar">Eliminar</button>
+    </div>
+   </div>
+  </div><!-- Modal para agregar/editar usuario -->
+  <div class="modal-overlay" id="modalUsuario">
+   <div class="modal-content modal-form">
+    <h3 id="tituloModalUsuario">Agregar Nuevo Usuario</h3>
+    <form id="formUsuario"><input type="hidden" id="usuarioId">
+     <div class="form-group"><label for="usuarioDepartamento">Departamento <span class="required">*</span></label> <select id="usuarioDepartamento" required> <option value="">Seleccione un departamento</option> </select>
+     </div>
+     <div class="form-group"><label for="usuarioArea">Área <span class="required">*</span></label> <select id="usuarioArea" required disabled> <option value="">Primero seleccione un departamento</option> </select>
+     </div>
+     <div class="form-group"><label for="usuarioPuesto">Puesto <span class="required">*</span></label> <input type="text" id="usuarioPuesto" required>
+     </div>
+     <div class="form-group"><label for="usuarioPerfil">Perfil de Usuario <span class="required">*</span></label> <select id="usuarioPerfil" required> <option value="">Seleccione un perfil</option> <option value="MASTER">Master</option> <option value="ADMINISTRADOR">Administrador</option> <option value="GERENTE">Gerente</option> <option value="COLABORADOR">Colaborador</option> </select>
+     </div>
+     <div class="modal-actions"><button type="button" class="btn btn-secondary btn-small" id="btnCancelarUsuario">Cancelar</button> <button type="submit" class="btn btn-primary btn-small">Guardar</button>
+     </div>
+    </form>
+   </div>
+  </div><!-- Modal de visualización de idea -->
+  <div class="modal-overlay" id="modalVisualizarIdea">
+   <div class="modal-content modal-visualizar">
+    <h3>📋 Detalle de Idea de Mejora</h3>
+    <div id="contenidoDetalleIdea"></div>
+    <div class="modal-actions"><button class="btn btn-primary btn-small" id="btnCerrarVisualizar">Cerrar</button>
+    </div>
+   </div>
+  </div><!-- Modal de seguimiento -->
+  <div class="modal-overlay" id="modalSeguimiento">
+   <div class="modal-content modal-form">
+    <h3 id="tituloModalSeguimiento">📊 Seguimiento de Idea de Mejora</h3>
+    <div style="background: #e3f2fd; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #2196f3;">
+     <div style="font-weight: 700; color: #1565c0; margin-bottom: 5px;">
+      Código de Idea:
+     </div>
+     <div style="font-size: 18px; color: #333;" id="codigoIdeaSeguimiento"></div>
+    </div>
+    <form id="formSeguimiento"><input type="hidden" id="seguimientoIdeaId">
+     <div class="form-group"><label>Estado de Aprobación <span class="required">*</span></label>
+      <div style="display: flex; gap: 20px; margin-top: 10px;"><label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal;"> <input type="radio" name="estadoAprobacion" value="aprobado" id="radioAprobado" required> <span style="color: #2e7d32; font-weight: 600;">✅ Aprobado</span> </label> <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal;"> <input type="radio" name="estadoAprobacion" value="no_aprobado" id="radioNoAprobado" required> <span style="color: #c62828; font-weight: 600;">❌ No Aprobado</span> </label>
+      </div>
+     </div>
+     <div class="form-group" id="grupoDepartamentoImplementador" style="display: none;"><label for="departamentoImplementador">Departamento Implementador <span class="required">*</span></label> <select id="departamentoImplementador"> <option value="">Seleccione un departamento</option> </select>
+     </div>
+     <div class="modal-actions"><button type="button" class="btn btn-secondary btn-small" id="btnCancelarSeguimiento">Cancelar</button> <button type="submit" class="btn btn-primary btn-small" id="btnGuardarSeguimiento">Guardar</button>
+     </div>
+    </form>
+   </div>
+  </div>
+  <main class="main-content">
+   <section id="dashboard" class="section active">
+    <h2>Dashboard</h2>
+    <p>Contenido del Dashboard. Aquí se mostrarán las métricas y estadísticas principales del sistema.</p>
+   </section>
+   <section id="registrar-ideas" class="section">
+    <h2>Registrar</h2>
+    <p>Complete el formulario para registrar una nueva idea de mejora</p>
+    <div class="form-container">
+     <form id="formRegistrar"><input type="hidden" id="ideaId">
+      <div class="form-group"><label for="nombreColaborador">Nombre del Colaborador</label> <input type="text" id="nombreColaborador" value="LUIS ALBERTO IBARRA GONZALEZ" readonly>
+      </div>
+      <div class="form-group"><label for="fuenteGeneracion">Fuente de Generación <span class="required">*</span></label> <select id="fuenteGeneracion" required> <option value="">Seleccione una opción</option> <option value="Análisis Interno">Análisis Interno</option> <option value="Retroalimentación de Cliente">Retroalimentación de Cliente</option> <option value="Auditoría">Auditoría</option> <option value="Sugerencia de Colaborador">Sugerencia de Colaborador</option> </select>
+      </div>
+      <div class="form-group"><label for="descripcionIdea">Describe de manera clara tu idea de mejora <span class="required">*</span></label> <textarea id="descripcionIdea" rows="5" placeholder="Explica tu idea de mejora de forma detallada..." required></textarea>
+      </div>
+      <div class="form-group"><label for="situacionActual">¿Cuál es la situación actualmente? <span class="required">*</span></label> <textarea id="situacionActual" rows="5" placeholder="Describe la situación actual que motiva esta idea de mejora..." required></textarea>
+      </div>
+      <div class="form-group"><label for="impacto">Impacto de tu idea de mejora <span class="required">*</span></label> <select id="impacto" required> <option value="">Seleccione una opción</option> <option value="Reducción de Costos">Reducción de Costos</option> <option value="Mejora de Calidad">Mejora de Calidad</option> <option value="Incremento de Productividad">Incremento de Productividad</option> <option value="Satisfacción del Cliente">Satisfacción del Cliente</option> </select>
+      </div>
+      <div class="form-group"><label for="documentacion">Documentación (Opcional)</label>
+       <div class="file-upload-area"><input type="file" id="documentacion" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png">
+        <div class="file-upload-text"><span>📎 Seleccionar archivos</span> <small>Formatos permitidos: PDF, Word, Excel, PowerPoint, TXT, JPG, PNG</small>
+        </div>
+       </div>
+       <div id="listaArchivos" class="file-list"></div>
+      </div>
+      <div class="form-actions"><button type="submit" class="btn btn-primary" id="btnSubmit">Registrar</button> <button type="button" class="btn btn-secondary" id="btnCancelar">Cancelar</button>
+      </div>
+     </form>
+    </div>
+   </section>
+   <section id="biblioteca" class="section">
+    <h2>Biblioteca de Ideas</h2>
+    <p>Repositorio de ideas de mejora cerradas. <span style="background: #ff5722; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 700;">🔴 SOLO MASTER</span> <span style="background: #c62828; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 700;">SOLO LECTURA</span></p>
+    <div class="table-container"><!-- Panel de filtros -->
+     <div class="filtros-panel">
+      <div class="filtros-row">
+       <div class="filtro-grupo"><label for="filtroBusquedaPorBiblioteca">Buscar en:</label> <select id="filtroBusquedaPorBiblioteca"> <option value="todas">Todas las columnas</option> <option value="codigo">Código</option> <option value="colaborador">Colaborador</option> <option value="area">Área</option> <option value="puesto">Puesto</option> <option value="fuenteGeneracion">Fuente de Generación</option> <option value="descripcionIdea">Descripción de la Idea</option> <option value="impacto">Impacto</option> </select>
+       </div>
+       <div class="filtro-grupo filtro-busqueda"><label for="filtroBusquedaBiblioteca">Búsqueda:</label> <input type="text" id="filtroBusquedaBiblioteca" placeholder="Escribe para buscar...">
+       </div>
+      </div>
+      <div class="filtros-row">
+       <div class="filtro-grupo"><label for="filtroFechaTipoBiblioteca">Filtrar por fecha:</label> <select id="filtroFechaTipoBiblioteca"> <option value="todos">Todas las fechas</option> <option value="mes">Por mes</option> <option value="fecha">Fecha específica</option> <option value="rango">Rango de fechas</option> </select>
+       </div>
+       <div class="filtro-grupo filtro-fecha" id="grupoMesBiblioteca" style="display: none;"><label for="filtroMesBiblioteca">Mes:</label> <input type="month" id="filtroMesBiblioteca">
+       </div>
+       <div class="filtro-grupo filtro-fecha" id="grupoFechaEspecificaBiblioteca" style="display: none;"><label for="filtroFechaEspecificaBiblioteca">Fecha:</label> <input type="date" id="filtroFechaEspecificaBiblioteca">
+       </div>
+       <div class="filtro-grupo filtro-fecha" id="grupoFechaDesdeBiblioteca" style="display: none;"><label for="filtroFechaDesdeBiblioteca">Desde:</label> <input type="date" id="filtroFechaDesdeBiblioteca">
+       </div>
+       <div class="filtro-grupo filtro-fecha" id="grupoFechaHastaBiblioteca" style="display: none;"><label for="filtroFechaHastaBiblioteca">Hasta:</label> <input type="date" id="filtroFechaHastaBiblioteca">
+       </div>
+       <div class="filtro-grupo"><button class="btn-limpiar-filtros" id="btnLimpiarFiltrosBiblioteca">   Limpiar Filtros</button>
+       </div>
+      </div>
+      <div class="contador-registros"><span id="contadorRegistrosBiblioteca">Mostrando <strong>0</strong> de <strong>0</strong> registros</span>
+      </div>
+     </div>
+     <table class="tabla-ideas">
+      <thead>
+       <tr>
+        <th>Fecha Registro</th>
+        <th>Código</th>
+        <th>Colaborador</th>
+        <th>Área</th>
+        <th>Puesto</th>
+        <th>Fuente de Generación</th>
+        <th>Descripción de la Idea</th>
+        <th>Situación Actual</th>
+        <th>Impacto</th>
+        <th>Estatus</th>
+        <th>Documentación</th>
+        <th>Opciones</th>
+       </tr>
+      </thead>
+      <tbody id="tablaIdeasBibliotecaBody"><!-- Los registros se insertarán aquí din  micamente -->
+      </tbody>
+     </table>
+     <div id="mensajeVacioBiblioteca" class="mensaje-vacio visible">
+      No hay ideas cerradas disponibles en la biblioteca
+     </div>
+    </div>
+   </section>
+   <section id="ideas-registradas" class="section">
+    <h2>Mis Ideas</h2>
+    <p>Listado de todas las ideas de mejora registradas en el sistema.</p>
+    <div class="table-container"><!-- Panel de filtros -->
+     <div class="filtros-panel">
+      <div class="filtros-row">
+       <div class="filtro-grupo"><label for="filtroBusquedaPor">Buscar en:</label> <select id="filtroBusquedaPor"> <option value="todas">Todas las columnas</option> <option value="codigo">Código</option> <option value="colaborador">Colaborador</option> <option value="area">Área</option> <option value="puesto">Puesto</option> <option value="fuenteGeneracion">Fuente de Generación</option> <option value="descripcionIdea">Descripción de la Idea</option> <option value="impacto">Impacto</option> </select>
+       </div>
+       <div class="filtro-grupo filtro-busqueda"><label for="filtroBusqueda">Búsqueda:</label> <input type="text" id="filtroBusqueda" placeholder="Escribe para buscar...">
+       </div>
+       <div class="filtro-grupo"><label for="filtroEstatus">Estatus:</label> <select id="filtroEstatus"> <option value="todos">Todos</option> <option value="Abierto">🟢 Abierto</option> <option value="Cerrado">🔴 Cerrado</option> </select>
+       </div>
+      </div>
+      <div class="filtros-row">
+       <div class="filtro-grupo"><label for="filtroFechaTipo">Filtrar por fecha:</label> <select id="filtroFechaTipo"> <option value="todos">Todas las fechas</option> <option value="mes">Por mes</option> <option value="fecha">Fecha específica</option> <option value="rango">Rango de fechas</option> </select>
+       </div>
+       <div class="filtro-grupo filtro-fecha" id="grupoMes" style="display: none;"><label for="filtroMes">Mes:</label> <input type="month" id="filtroMes">
+       </div>
+       <div class="filtro-grupo filtro-fecha" id="grupoFechaEspecifica" style="display: none;"><label for="filtroFechaEspecifica">Fecha:</label> <input type="date" id="filtroFechaEspecifica">
+       </div>
+       <div class="filtro-grupo filtro-fecha" id="grupoFechaDesde" style="display: none;"><label for="filtroFechaDesde">Desde:</label> <input type="date" id="filtroFechaDesde">
+       </div>
+       <div class="filtro-grupo filtro-fecha" id="grupoFechaHasta" style="display: none;"><label for="filtroFechaHasta">Hasta:</label> <input type="date" id="filtroFechaHasta">
+       </div>
+       <div class="filtro-grupo"><button class="btn-limpiar-filtros" id="btnLimpiarFiltros">🔄 Limpiar Filtros</button>
+       </div>
+      </div>
+      <div class="contador-registros"><span id="contadorRegistros">Mostrando <strong>0</strong> de <strong>0</strong> registros</span>
+      </div>
+     </div>
+     <table class="tabla-ideas">
+      <thead>
+       <tr>
+        <th>Fecha Registro</th>
+        <th>Código</th>
+        <th>Colaborador</th>
+        <th>Área</th>
+        <th>Puesto</th>
+        <th>Fuente de Generación</th>
+        <th>Descripción de la Idea</th>
+        <th>Situación Actual</th>
+        <th>Impacto</th>
+        <th>Estatus</th>
+        <th>Documentación</th>
+        <th>Opciones</th>
+       </tr>
+      </thead>
+      <tbody id="tablaIdeasBody"><!-- Los registros se insertarán aquí dinámicamente -->
+      </tbody>
+     </table>
+     <div id="mensajeVacio" class="mensaje-vacio visible">
+      No hay ideas registradas aún
+     </div>
+    </div>
+   </section>
+   <section id="administrar-perfil" class="section">
+    <h2>Administrar Perfil MejorISSA</h2>
+    <p>Gestión de perfiles de usuario y asignación de permisos en el sistema MejorISSA.</p>
+    <div class="info-permisos">
+     <h4>📋 Información de Perfiles de Usuario</h4>
+     <div class="permisos-grid">
+      <div class="permiso-card"><strong>🔴 Master</strong>
+       <ul>
+        <li>Acceso total al sistema</li>
+        <li>Gestión de todos los usuarios</li>
+        <li>Configuración del sistema</li>
+        <li>Administración de catálogos</li>
+       </ul>
+      </div>
+      <div class="permiso-card"><strong>   Administrador</strong>
+       <ul>
+        <li>Gestión de usuarios</li>
+        <li>Ver todas las ideas</li>
+        <li>Asignar seguimientos</li>
+        <li>Generar reportes</li>
+       </ul>
+      </div>
+      <div class="permiso-card"><strong>🟠 Gerente</strong>
+       <ul>
+        <li>Ver ideas de su   rea</li>
+        <li>Aprobar/Rechazar ideas</li>
+        <li>Asignar recursos</li>
+        <li>Dashboard de área</li>
+       </ul>
+      </div>
+      <div class="permiso-card"><strong>🟢 Colaborador</strong>
+       <ul>
+        <li>Registrar ideas</li>
+        <li>Ver sus propias ideas</li>
+        <li>Ver seguimiento</li>
+        <li>Editar ideas en borrador</li>
+       </ul>
+      </div>
+     </div>
+    </div>
+    <div class="perfiles-container">
+     <div class="perfiles-header">
+      <h3>Usuarios del Sistema (150+ usuarios)</h3><button class="btn-agregar-usuario" id="btnAgregarUsuario">➕ Agregar Usuario</button>
+     </div><!-- Buscador de usuarios -->
+     <div class="filtros-panel" style="margin-bottom: 20px;">
+      <div class="filtros-row">
+       <div class="filtro-grupo filtro-busqueda"><label for="buscarUsuario">🔍 Buscar Usuario:</label> <input type="text" id="buscarUsuario" placeholder="Buscar por departamento, área, puesto, perfil o prefijo...">
+       </div>
+       <div class="filtro-grupo"><button class="btn-limpiar-filtros" id="btnLimpiarBusquedaUsuario">🔄 Limpiar Búsqueda</button>
+       </div>
+      </div>
+      <div class="contador-registros"><span id="contadorUsuarios">Mostrando <strong>0</strong> de <strong>0</strong> usuarios</span>
+      </div>
+     </div>
+     <div class="tabla-perfiles-wrapper">
+      <table class="tabla-perfiles">
+       <thead>
+        <tr>
+         <th>ID</th>
+         <th>Departamento</th>
+         <th>Área</th>
+         <th>Puesto</th>
+         <th>Perfil Actual</th>
+         <th>Prefijo</th>
+         <th>Cambiar Perfil</th>
+         <th>Acciones</th>
+        </tr>
+       </thead>
+       <tbody id="tablaPerfilesBody"><!-- Los usuarios se insertarán aquí dinámicamente -->
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </section>
+   <section id="personalizacion" class="section">
+    <h2>Personalización del Portal</h2>
+    <p>Configuración de temas, logos y preferencias de visualización del sistema MejorISSA.</p>
+    <div class="form-container" style="max-width: 900px;">
+     <h3 style="color: #1a237e; margin-bottom: 25px; font-size: 20px;">   ️ Opciones de Personalización</h3>
+     <div class="form-group"><label for="avatarUsuario"> 👤 Avatar de Usuario <small style="display: block; color: #666; font-weight: normal; margin-top: 5px;"> Sube una imagen que se mostrará de forma circular en el topbar junto a tu información </small> </label>
+      <div class="file-upload-area" style="padding: 30px;"><input type="file" id="avatarUsuario" accept="image/png,image/jpeg,image/jpg,image/gif">
+       <div class="file-upload-text"><span>📸 Seleccionar Imagen de Avatar</span> <small>Formatos permitidos: PNG, JPG, JPEG, GIF | Tamaño recomendado: 200x200px</small>
+       </div>
+      </div>
+      <div id="previewAvatar" style="margin-top: 15px; display: none;">
+       <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px;"><img id="imgPreviewAvatar" src="" alt="Preview Avatar" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #1a237e;">
+        <div style="flex: 1;">
+         <div style="font-weight: 600; color: #333; margin-bottom: 5px;">
+          Vista Previa del Avatar
+         </div>
+         <div style="font-size: 12px; color: #666;">
+          Esta imagen se mostrará en el topbar
+         </div>
+        </div><button type="button" class="btn btn-secondary btn-small" onclick="eliminarAvatar()">🗑️ Eliminar</button>
+       </div>
+      </div>
+     </div>
+     <div class="form-group" style="margin-top: 35px;"><label for="logoPortal"> 🎨 Logo del Portal <small style="display: block; color: #666; font-weight: normal; margin-top: 5px;"> Sube un logo que reemplazará el t  tulo "MejorISSA" en el topbar (mantiene la función de ir al Dashboard) </small> </label>
+      <div class="file-upload-area" style="padding: 30px;"><input type="file" id="logoPortal" accept="image/png,image/jpeg,image/jpg,image/gif,image/svg+xml">
+       <div class="file-upload-text"><span>🖼️ Seleccionar Logo del Portal</span> <small>Formatos permitidos: PNG, JPG, JPEG, GIF, SVG | Tamaño recomendado: 200x50px</small>
+       </div>
+      </div>
+      <div id="previewLogo" style="margin-top: 15px; display: none;">
+       <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px;"><img id="imgPreviewLogo" src="" alt="Preview Logo" style="max-width: 200px; max-height: 60px; object-fit: contain;">
+        <div style="flex: 1;">
+         <div style="font-weight: 600; color: #333; margin-bottom: 5px;">
+          Vista Previa del Logo
+         </div>
+         <div style="font-size: 12px; color: #666;">
+          Este logo reemplazará el título "MejorISSA" en el topbar
+         </div>
+        </div><button type="button" class="btn btn-secondary btn-small" onclick="eliminarLogo()">🗑️ Eliminar</button>
+       </div>
+      </div>
+     </div>
+     <div class="form-actions" style="margin-top: 35px;"><button type="button" class="btn btn-primary" onclick="guardarPersonalizacion()">💾 Guardar Cambios</button> <button type="button" class="btn btn-secondary" onclick="resetearPersonalizacion()">🔄 Restaurar Por Defecto</button>
+     </div>
+    </div>
+   </section>
+   <section id="agregar-acciones" class="section">
+    <h2>Agregar Acciones</h2>
+    <p>Agregue acciones de implementación a las ideas de mejora aprobadas.</p>
+    <div class="table-container">
+     <div class="filtros-panel">
+      <div class="filtros-row">
+       <div class="filtro-grupo filtro-busqueda"><label for="busquedaAcciones">🔍 Buscar:</label> <input type="text" id="busquedaAcciones" placeholder="Buscar por código o departamento...">
+       </div>
+       <div class="filtro-grupo"><button class="btn-limpiar-filtros" id="btnLimpiarBusquedaAcciones">🔄 Limpiar Búsqueda</button>
+       </div>
+      </div>
+      <div class="contador-registros"><span id="contadorAcciones">Mostrando <strong>0</strong> ideas aprobadas</span>
+      </div>
+     </div>
+     <table class="tabla-ideas">
+      <thead>
+       <tr>
+        <th>Código</th>
+        <th>Colaborador</th>
+        <th>Descripción de la Idea</th>
+        <th>Departamento Implementador</th>
+        <th>Acciones</th>
+       </tr>
+      </thead>
+      <tbody id="tablaAccionesBody"><!-- Los registros se insertarán aquí dinámicamente -->
+      </tbody>
+     </table>
+     <div id="mensajeVacioAcciones" class="mensaje-vacio visible">
+      No hay ideas aprobadas pendientes de acciones de implementación
+     </div>
+    </div>
+   </section>
+   <section id="gestion-acciones" class="section">
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;"><button class="btn btn-secondary" onclick="volverAgregarAcciones()" style="padding: 10px 20px;"> ← Volver </button>
+     <div>
+      <h2 style="margin: 0;">Gestión de Acciones de Implementación</h2>
+      <p style="margin: 5px 0 0 0;" id="descripcionIdeaGestion"></p>
+     </div>
+    </div>
+    <div style="background: #e3f2fd; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #2196f3;">
+     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+      <div>
+       <div style="font-weight: 700; color: #1565c0; margin-bottom: 5px;">
+        Código de Idea:
+       </div>
+       <div style="font-size: 20px; color: #333;" id="codigoIdeaGestion"></div>
+      </div>
+      <div>
+       <div style="font-weight: 700; color: #1565c0; margin-bottom: 5px;">
+        Colaborador Generador:
+       </div>
+       <div style="font-size: 16px; color: #333;" id="colaboradorIdeaGestion"></div>
+      </div>
+      <div>
+       <div style="font-weight: 700; color: #1565c0; margin-bottom: 5px;">
+        Departamento Implementador:
+       </div>
+       <div style="font-size: 16px; color: #333;" id="departamentoImplementadorGestion"></div>
+      </div>
+     </div>
+    </div>
+    <div id="seccionAgregarAcciones" style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 25px;">
+     <h3 style="color: #1a237e; margin-bottom: 20px;">➕ Agregar Nueva Acción</h3>
+     <form id="formAgregarAccion"><input type="hidden" id="ideaIdAccion">
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+       <div class="form-group" style="margin: 0;"><label for="accionDescripcion">Descripción de la Acción <span class="required">*</span></label> <textarea id="accionDescripcion" rows="3" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;"></textarea>
+       </div>
+       <div class="form-group" style="margin: 0;"><label for="accionResponsable">Colaborador Responsable <span class="required">*</span></label> <input type="text" id="accionResponsable" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+       </div>
+       <div class="form-group" style="margin: 0;"><label for="accionFechaCompromiso">Fecha Compromiso <span class="required">*</span></label> <input type="date" id="accionFechaCompromiso" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+       </div>
+      </div><button type="submit" class="btn btn-primary">💾 Guardar Acción</button>
+     </form>
+    </div>
+    <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+     <h3 style="color: #1a237e; margin-bottom: 20px;">📋 Seguimiento de Acciones</h3>
+     <div id="listaAcciones">
+      <div style="text-align: center; padding: 40px; color: #999;">
+       No hay acciones registradas aún. Agrega la primera acción usando el formulario de arriba.
+      </div>
+     </div>
+    </div>
+   </section>
+   <section id="seguimiento" class="section">
+    <h2>Seguimiento</h2>
+    <p>Visualización del seguimiento de las ideas de mejora en proceso de implementación.</p>
+    <div class="table-container"><!-- Panel de filtros -->
+     <div class="filtros-panel">
+      <div class="filtros-row">
+       <div class="filtro-grupo"><label for="filtroBusquedaPorSeguimiento">Buscar en:</label> <select id="filtroBusquedaPorSeguimiento"> <option value="todas">Todas las columnas</option> <option value="codigo">Código</option> <option value="colaborador">Colaborador</option> <option value="contrato">Contrato</option> <option value="impacto">Impacto</option> <option value="implementador">Implementador</option> </select>
+       </div>
+       <div class="filtro-grupo filtro-busqueda"><label for="filtroBusquedaSeguimiento">B  squeda:</label> <input type="text" id="filtroBusquedaSeguimiento" placeholder="Escribe para buscar...">
+       </div>
+       <div class="filtro-grupo"><label for="filtroEstatusSeguimiento">Estatus Idea:</label> <select id="filtroEstatusSeguimiento"> <option value="todos">Todos</option> <option value="Abierto">🟢 Abierto</option> <option value="Cerrado">       Cerrado</option> </select>
+       </div>
+       <div class="filtro-grupo"><label for="filtroEstatusImplementacion">Estatus Implementación:</label> <select id="filtroEstatusImplementacion"> <option value="todos">Todos</option> <option value="cerrado">Cerrado</option> <option value="retraso por generador de idea">Retraso por Generador</option> <option value="retraso TI">Retraso TI</option> <option value="reprogramado">Reprogramado</option> <option value="retraso auditoria">Retraso Auditor  a</option> <option value="en tiempo">En Tiempo</option> <option value="por aprobar">Por Aprobar</option> <option value="sin medición">Sin Medición</option> <option value="sin planes de acción">Sin Planes de Acción</option> </select>
+       </div>
+       <div class="filtro-grupo"><button class="btn-limpiar-filtros" id="btnLimpiarFiltrosSeguimiento">🔄 Limpiar Filtros</button>
+       </div>
+      </div>
+      <div class="contador-registros"><span id="contadorRegistrosSeguimiento">Mostrando <strong>0</strong> de <strong>0</strong> registros</span>
+      </div>
+     </div>
+     <table class="tabla-ideas" style="min-width: 2400px;">
+      <thead>
+       <tr>
+        <th style="min-width: 100px;">Código</th>
+        <th style="min-width: 200px;">Colaborador</th>
+        <th style="min-width: 120px;">Contrato</th>
+        <th style="min-width: 180px;">Impacto de Idea</th>
+        <th style="min-width: 120px;">Estatus de la Idea</th>
+        <th style="min-width: 180px;">Estatus de Implementación</th>
+        <th style="min-width: 150px;">Estatus de Cumplimiento</th>
+        <th style="min-width: 150px;">Fecha de Aprobación</th>
+        <th style="min-width: 180px;">Implementador</th>
+        <th style="min-width: 180px;">Prototipo</th>
+        <th style="min-width: 180px;">Adecuaciones</th>
+        <th style="min-width: 180px;">Liberación</th>
+        <th style="min-width: 120px;">Mes de Cierre</th>
+        <th style="min-width: 150px;">Fecha de Cierre</th>
+        <th style="min-width: 250px;">Comentario</th>
+        <th style="min-width: 150px;">Opciones</th>
+       </tr>
+      </thead>
+      <tbody id="tablaSeguimientoBody"><!-- Los registros se insertarán aquí dinámicamente -->
+      </tbody>
+     </table>
+     <div id="mensajeVacioSeguimiento" class="mensaje-vacio visible">
+      No hay ideas en seguimiento aún
+     </div>
+    </div>
+   </section>
+   <section id="agenda" class="section">
+    <h2>Agenda</h2>
+    <p>Agenda electrónica para la gestión de eventos y recordatorios.</p>
+   </section>
+   <section id="cronograma" class="section">
+    <h2>Ver Cronograma</h2>
+    <p>Cronograma de prototipos y liberaciones programadas.</p>
+   </section>
+   <section id="catalogos" class="section">
+    <h2>Administrar Catálogos</h2>
+    <p>Gestión de catálogos del sistema: áreas, impactos, fuentes de generación.</p>
+   </section>
+   <section id="salir" class="section">
+    <h2>Salir</h2>
+    <p>Cerrando sesión del sistema...</p>
+   </section>
+  </main>
+  <script>
+        // Variables globales
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const topbarTitle = document.getElementById('topbarTitle');
+        const topbarLogo = document.getElementById('topbarLogo');
+        const topbarAvatar = document.getElementById('topbarAvatar');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sections = document.querySelectorAll('.section');
+        const formRegistrar = document.getElementById('formRegistrar');
+        const btnCancelar = document.getElementById('btnCancelar');
+        const btnSubmit = document.getElementById('btnSubmit');
+        const inputDocumentacion = document.getElementById('documentacion');
+        const listaArchivos = document.getElementById('listaArchivos');
+        const tablaIdeasBody = document.getElementById('tablaIdeasBody');
+        const mensajeVacio = document.getElementById('mensajeVacio');
+        const modalEliminar = document.getElementById('modalEliminar');
+        const btnCancelarEliminar = document.getElementById('btnCancelarEliminar');
+        const btnConfirmarEliminar = document.getElementById('btnConfirmarEliminar');
+
+        // Variables para perfiles
+        const modalUsuario = document.getElementById('modalUsuario');
+        const formUsuario = document.getElementById('formUsuario');
+        const btnAgregarUsuario = document.getElementById('btnAgregarUsuario');
+        const btnCancelarUsuario = document.getElementById('btnCancelarUsuario');
+        const tablaPerfilesBody = document.getElementById('tablaPerfilesBody');
+        const tituloModalUsuario = document.getElementById('tituloModalUsuario');
+
+        // Variables para visualización
+        const modalVisualizarIdea = document.getElementById('modalVisualizarIdea');
+        const btnCerrarVisualizar = document.getElementById('btnCerrarVisualizar');
+        const contenidoDetalleIdea = document.getElementById('contenidoDetalleIdea');
+
+        // Variables para seguimiento
+        const modalSeguimiento = document.getElementById('modalSeguimiento');
+        const formSeguimiento = document.getElementById('formSeguimiento');
+        const btnCancelarSeguimiento = document.getElementById('btnCancelarSeguimiento');
+        const radioAprobado = document.getElementById('radioAprobado');
+        const radioNoAprobado = document.getElementById('radioNoAprobado');
+        const grupoDepartamentoImplementador = document.getElementById('grupoDepartamentoImplementador');
+        const departamentoImplementador = document.getElementById('departamentoImplementador');
+        const codigoIdeaSeguimiento = document.getElementById('codigoIdeaSeguimiento');
+        const btnGuardarSeguimiento = document.getElementById('btnGuardarSeguimiento');
+
+        // Variables para agregar acciones
+        const tablaAccionesBody = document.getElementById('tablaAccionesBody');
+        const mensajeVacioAcciones = document.getElementById('mensajeVacioAcciones');
+        const busquedaAcciones = document.getElementById('busquedaAcciones');
+        const btnLimpiarBusquedaAcciones = document.getElementById('btnLimpiarBusquedaAcciones');
+        const contadorAcciones = document.getElementById('contadorAcciones');
+        
+        let ideasAprobadasFiltradas = [];
+
+        // Variables para personalización
+        const inputAvatar = document.getElementById('avatarUsuario');
+        const inputLogo = document.getElementById('logoPortal');
+        const previewAvatar = document.getElementById('previewAvatar');
+        const previewLogo = document.getElementById('previewLogo');
+        const imgPreviewAvatar = document.getElementById('imgPreviewAvatar');
+        const imgPreviewLogo = document.getElementById('imgPreviewLogo');
+        
+        let avatarSeleccionado = null;
+        let logoSeleccionado = null;
+
+        // Variables para filtrado de usuarios
+        let usuariosFiltrados = [];
+        const buscarUsuario = document.getElementById('buscarUsuario');
+        const btnLimpiarBusquedaUsuario = document.getElementById('btnLimpiarBusquedaUsuario');
+        const contadorUsuarios = document.getElementById('contadorUsuarios');
+
+        let archivosSeleccionados = [];
+        let ideas = [];
+        let foliosPorDepartamento = {
+            'TI': 0,
+            'CF': 0,
+            'RH': 0,
+            'OP': 0
+        };
+        let idCounter = 1;
+        let ideaAEliminar = null;
+        let modoEdicion = false;
+
+        // Variables para usuarios
+        let usuarios = [];
+        let usuarioIdCounter = 1;
+        let modoEdicionUsuario = false;
+        let cambiosPendientes = {};
+
+        // Catálogo completo de áreas con sus prefijos
+        const catalogoAreas = [
+            { departamento: 'VENTAS', area: 'ALMACEN DE PRODUCTO', prefijo: 'AL', puestos: [
+                { puesto: 'COORDINADOR DE ALMACEN', perfil: 'GERENTE' },
+                { puesto: 'ASISTENTE DE ALMACEN', perfil: 'COLABORADOR', cantidad: 4 },
+                { puesto: 'ENCARGADO DE ALMACEN', perfil: 'COLABORADOR' }
+            ]},
+            { departamento: 'VENTAS', area: 'DETALLE', prefijo: 'VT', puestos: [
+                { puesto: 'REPRESENTANTE DE VENTAS DETALLE', perfil: 'COLABORADOR', cantidad: 13 },
+                { puesto: 'SUPERVISOR DE RUTAS DETALLE', perfil: 'GERENTE' },
+                { puesto: 'COORDINADOR DE VENTAS DETALLE', perfil: 'GERENTE' }
+            ]},
+            { departamento: 'VENTAS', area: 'DOMICILIO', prefijo: 'VD', puestos: [
+                { puesto: 'PROMOTOR DE CAMBACEO', perfil: 'COLABORADOR', cantidad: 8 },
+                { puesto: 'ENCARGADA ADMINISTRATIVA DOMICILIO Y DETALLE', perfil: 'COLABORADOR' },
+                { puesto: 'ASESOR DE CAMBACEO', perfil: 'COLABORADOR', cantidad: 3 },
+                { puesto: 'REPRESENTANTE DE VENTAS DOMICILIO', perfil: 'COLABORADOR' },
+                { puesto: 'ENCARGADO DE REGION', perfil: 'COLABORADOR' }
+            ]},
+            { departamento: 'VENTAS', area: 'GERENCIA DE VENTAS', prefijo: 'VE', puestos: [
+                { puesto: 'GERENTE DE VENTAS', perfil: 'GERENTE' }
+            ]},
+            { departamento: 'VENTAS', area: 'MAYOREO', prefijo: 'VM', puestos: [
+                { puesto: 'ENCARGADA ADMINISTRATIVA MAYOREO', perfil: 'COLABORADOR' },
+                { puesto: 'SUPERVISOR DE TIENDAS', perfil: 'GERENTE', cantidad: 4 },
+                { puesto: 'REPRESENTANTE DE VENTAS MAYOREO', perfil: 'COLABORADOR', cantidad: 11 },
+                { puesto: 'PROMOTOR', perfil: 'COLABORADOR', cantidad: 29 },
+                { puesto: 'ASISTENTE ADMINISTRATIVA MAYOREO', perfil: 'COLABORADOR' },
+                { puesto: 'SUPERVISOR DE RUTAS MAYOREO', perfil: 'GERENTE' }
+            ]},
+            { departamento: 'CALIDAD', area: 'CALIDAD', prefijo: 'CA', puestos: [
+                { puesto: 'GERENTE DE CALIDAD', perfil: 'MASTER' },
+                { puesto: 'ASISTENTE DE CALIDAD', perfil: 'MASTER' },
+                { puesto: 'ENCARGADO DE MEJORA CONTINUA', perfil: 'COLABORADOR' }
+            ]},
+            { departamento: 'DIFUSION Y MERCADOTECNIA', area: 'DIFUSION Y MERCADOTECNIA', prefijo: 'DI', puestos: [
+                { puesto: 'GERENTE DE DIFUSION Y MERCADOTECNIA', perfil: 'GERENTE' },
+                { puesto: 'COORDINADOR DE EVENTOS', perfil: 'GERENTE' },
+                { puesto: 'ENCARGADO DE DIFUSION', perfil: 'COLABORADOR', cantidad: 2 },
+                { puesto: 'ENCARGADO DE REDES SOCIALES', perfil: 'COLABORADOR' }
+            ]},
+            { departamento: 'DIRECCIÓN GENERAL', area: 'DIRECCIÓN GENERAL', prefijo: 'DG', puestos: [
+                { puesto: 'DIRECTORA GENERAL', perfil: 'MASTER' },
+                { puesto: 'CHOFER', perfil: 'COLABORADOR' },
+                { puesto: 'ASISTENTE GENERAL', perfil: 'COLABORADOR' },
+                { puesto: 'ASISTENTE DE LIMPIEZA', perfil: 'COLABORADOR' }
+            ]},
+            { departamento: 'FINANZAS', area: 'FINANZAS', prefijo: 'CF', puestos: [
+                { puesto: 'ASISTENTE DE CONTABILIDAD', perfil: 'COLABORADOR' },
+                { puesto: 'ENCARGADA DE CONTABILIDAD Y FISCAL', perfil: 'COLABORADOR', cantidad: 2 },
+                { puesto: 'GERENTE DE FINANZAS', perfil: 'GERENTE' }
+            ]},
+            { departamento: 'OPERACIONES', area: 'OPERACIONES', prefijo: 'OP', puestos: [
+                { puesto: 'ASISTENTE DE INVENTARIOS', perfil: 'COLABORADOR' },
+                { puesto: 'GUARDIA DE SEGURIDAD', perfil: 'COLABORADOR', cantidad: 3 },
+                { puesto: 'ENCARGADO DE MANTENIMIENTO', perfil: 'COLABORADOR' },
+                { puesto: 'ASISTENTE DE MANTENIMIENTO', perfil: 'COLABORADOR' },
+                { puesto: 'ENCARGADO DE INVENTARIOS', perfil: 'COLABORADOR' },
+                { puesto: 'ASISTENTE DE LIMPIEZA', perfil: 'COLABORADOR', cantidad: 2 },
+                { puesto: 'COORDINADOR DE OPERACIONES', perfil: 'GERENTE' }
+            ]},
+            { departamento: 'RECURSOS HUMANOS', area: 'RECURSOS HUMANOS', prefijo: 'RH', puestos: [
+                { puesto: 'ENCARGADO DE RELACIONES LABORALES', perfil: 'COLABORADOR' },
+                { puesto: 'ASISTENTE DE CAPACITACION', perfil: 'COLABORADOR', cantidad: 2 },
+                { puesto: 'COORDINADOR DE RECLUTAMIENTO Y SELECCION', perfil: 'GERENTE' },
+                { puesto: 'ENCARGADO DE RECLUTAMIENTO Y SELECCION', perfil: 'COLABORADOR', cantidad: 2 },
+                { puesto: 'RECEPCIONISTA', perfil: 'COLABORADOR' },
+                { puesto: 'COORDINADOR DE CAPACITACION', perfil: 'GERENTE' },
+                { puesto: 'GERENTE DE RECURSOS HUMANOS', perfil: 'GERENTE' }
+            ]},
+            { departamento: 'SERVICIO AL CLIENTE', area: 'SERVICIO AL CLIENTE', prefijo: 'SC', puestos: [
+                { puesto: 'ASISTENTE DE SERVICIO AL CLIENTE', perfil: 'COLABORADOR' },
+                { puesto: 'COORDINADOR DE SERVICIO AL CLIENTE', perfil: 'GERENTE' }
+            ]},
+            { departamento: 'SOPORTE A VENTAS', area: 'SOPORTE A VENTAS', prefijo: 'SV', puestos: [
+                { puesto: 'ASISTENTE DE COBRANZA Y FACTURACION', perfil: 'COLABORADOR', cantidad: 3 },
+                { puesto: 'GERENTE DE SOPORTE A VENTAS', perfil: 'GERENTE' },
+                { puesto: 'ENCARGADO DE FACTURACION Y COBRANZA', perfil: 'COLABORADOR' }
+            ]},
+            { departamento: 'TECNOLOGIAS DE INFORMACION', area: 'TECNOLOGIAS DE INFORMACION', prefijo: 'TI', puestos: [
+                { puesto: 'COORDINADOR DE TECNOLOGIAS DE INFORMACION', perfil: 'MASTER' },
+                { puesto: 'PROGRAMADOR SR.', perfil: 'ADMINISTRADOR', cantidad: 2 },
+                { puesto: 'ENCARGADO DE SOPORTE TECNICO', perfil: 'ADMINISTRADOR' },
+                { puesto: 'ANALISTA DE TECNOLOGIAS', perfil: 'MASTER' }
+            ]},
+            { departamento: 'VEHÍCULOS', area: 'VEHÍCULOS', prefijo: 'VH', puestos: [
+                { puesto: 'COORDINADOR DE VEHICULOS', perfil: 'GERENTE' },
+                { puesto: 'ASISTENTE DE VEHICULOS', perfil: 'COLABORADOR', cantidad: 2 }
+            ]}
+        ];
+
+        // Generar usuarios desde el catálogo
+        function generarUsuariosDesdeeCatalogo() {
+            catalogoAreas.forEach(areaData => {
+                areaData.puestos.forEach(puestoData => {
+                    const cantidad = puestoData.cantidad || 1;
+                    for (let i = 0; i < cantidad; i++) {
+                        usuarios.push({
+                            id: usuarioIdCounter++,
+                            departamento: areaData.departamento,
+                            area: areaData.area,
+                            puesto: puestoData.puesto,
+                            perfil: puestoData.perfil,
+                            prefijo: areaData.prefijo
+                        });
+                    }
+                });
+            });
+        }
+
+        // Inicializar usuarios
+        generarUsuariosDesdeeCatalogo();
+
+        // Inicializar usuarios filtrados
+        usuariosFiltrados = [...usuarios];
+
+        // Mapa de prefijos por   rea (para generación de códigos)
+        const departamentos = {};
+        catalogoAreas.forEach(area => {
+            departamentos[area.area] = area.prefijo;
+        });
+
+        // Event listeners para búsqueda de usuarios
+        buscarUsuario.addEventListener('input', filtrarUsuarios);
+
+        btnLimpiarBusquedaUsuario.addEventListener('click', function() {
+            buscarUsuario.value = '';
+            filtrarUsuarios();
+        });
+
+        function filtrarUsuarios() {
+            const textoBusqueda = buscarUsuario.value.toLowerCase().trim();
+            
+            if (!textoBusqueda) {
+                usuariosFiltrados = [...usuarios];
+            } else {
+                usuariosFiltrados = usuarios.filter(usuario => {
+                    return (
+                        usuario.departamento.toLowerCase().includes(textoBusqueda) ||
+                        usuario.area.toLowerCase().includes(textoBusqueda) ||
+                        usuario.puesto.toLowerCase().includes(textoBusqueda) ||
+                        usuario.perfil.toLowerCase().includes(textoBusqueda) ||
+                        usuario.prefijo.toLowerCase().includes(textoBusqueda) ||
+                        usuario.id.toString().includes(textoBusqueda)
+                    );
+                });
+            }
+            
+            actualizarTablaPerfiles();
+            actualizarContadorUsuarios();
+        }
+
+        function actualizarContadorUsuarios() {
+            const total = usuarios.length;
+            const mostrados = usuariosFiltrados.length;
+            contadorUsuarios.innerHTML = `Mostrando <strong>${mostrados}</strong> de <strong>${total}</strong> usuarios`;
+        }
+
+        // Funciones de personalización
+        inputAvatar.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    avatarSeleccionado = event.target.result;
+                    imgPreviewAvatar.src = avatarSeleccionado;
+                    previewAvatar.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        inputLogo.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    logoSeleccionado = event.target.result;
+                    imgPreviewLogo.src = logoSeleccionado;
+                    previewLogo.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function eliminarAvatar() {
+            avatarSeleccionado = null;
+            inputAvatar.value = '';
+            previewAvatar.style.display = 'none';
+            imgPreviewAvatar.src = '';
+        }
+
+        function eliminarLogo() {
+            logoSeleccionado = null;
+            inputLogo.value = '';
+            previewLogo.style.display = 'none';
+            imgPreviewLogo.src = '';
+        }
+
+        function guardarPersonalizacion() {
+            // Guardar avatar
+            if (avatarSeleccionado) {
+                localStorage.setItem('avatarUsuario', avatarSeleccionado);
+                topbarAvatar.src = avatarSeleccionado;
+                topbarAvatar.classList.add('active');
+            } else {
+                localStorage.removeItem('avatarUsuario');
+                topbarAvatar.classList.remove('active');
+            }
+            
+            // Guardar logo
+            if (logoSeleccionado) {
+                localStorage.setItem('logoPortal', logoSeleccionado);
+                topbarLogo.src = logoSeleccionado;
+                topbarLogo.classList.add('active');
+                topbarTitle.classList.add('hidden');
+            } else {
+                localStorage.removeItem('logoPortal');
+                topbarLogo.classList.remove('active');
+                topbarTitle.classList.remove('hidden');
+            }
+            
+            mostrarMensaje('✅ Personalización guardada exitosamente');
+        }
+
+        function resetearPersonalizacion() {
+            // Resetear avatar
+            avatarSeleccionado = null;
+            inputAvatar.value = '';
+            previewAvatar.style.display = 'none';
+            imgPreviewAvatar.src = '';
+            localStorage.removeItem('avatarUsuario');
+            topbarAvatar.classList.remove('active');
+            
+            // Resetear logo
+            logoSeleccionado = null;
+            inputLogo.value = '';
+            previewLogo.style.display = 'none';
+            imgPreviewLogo.src = '';
+            localStorage.removeItem('logoPortal');
+            topbarLogo.classList.remove('active');
+            topbarTitle.classList.remove('hidden');
+            
+            mostrarMensaje('🔄 Personalización restaurada por defecto');
+        }
+
+        // Cargar personalización al iniciar
+        function cargarPersonalizacion() {
+            const avatarGuardado = localStorage.getItem('avatarUsuario');
+            const logoGuardado = localStorage.getItem('logoPortal');
+            
+            if (avatarGuardado) {
+                topbarAvatar.src = avatarGuardado;
+                topbarAvatar.classList.add('active');
+                avatarSeleccionado = avatarGuardado;
+                imgPreviewAvatar.src = avatarGuardado;
+                previewAvatar.style.display = 'block';
+            }
+            
+            if (logoGuardado) {
+                topbarLogo.src = logoGuardado;
+                topbarLogo.classList.add('active');
+                topbarTitle.classList.add('hidden');
+                logoSeleccionado = logoGuardado;
+                imgPreviewLogo.src = logoGuardado;
+                previewLogo.style.display = 'block';
+            }
+        }
+
+        // Funciones de navegación
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+        }
+
+        hamburgerBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // Evento para ir al Dashboard al hacer clic en el título o logo
+        topbarTitle.addEventListener('click', function() {
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById('dashboard').classList.add('active');
+            closeSidebar();
+        });
+
+        topbarLogo.addEventListener('click', function() {
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById('dashboard').classList.add('active');
+            closeSidebar();
+        });
+
+        const toggleLinks = document.querySelectorAll('[data-toggle]');
+        toggleLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                const submenuId = this.getAttribute('data-toggle');
+                const submenu = document.getElementById(submenuId);
+                const arrow = this.querySelector('.menu-arrow');
+                
+                submenu.classList.toggle('active');
+                arrow.classList.toggle('rotated');
+            });
+        });
+
+        const navigationLinks = document.querySelectorAll('[data-section]');
+        navigationLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetSection = this.getAttribute('data-section');
+                
+                // Verificar si es la sección Biblioteca y si el usuario tiene perfil Master
+                if (targetSection === 'biblioteca') {
+                    const perfilUsuario = 'MASTER'; // En producción, obtener del usuario logueado
+                    if (perfilUsuario !== 'MASTER') {
+                        mostrarMensaje('⛔ Acceso denegado. Solo usuarios con perfil Master pueden acceder a la Biblioteca');
+                        return;
+                    }
+                }
+                
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                const target = document.getElementById(targetSection);
+                if (target) {
+                    target.classList.add('active');
+                    
+                    // Si es la sección de administrar perfil, actualizar tabla y contador
+                    if (targetSection === 'administrar-perfil') {
+                        filtrarUsuarios();
+                    }
+                    
+                    // Si es la sección de biblioteca, actualizar tabla
+                    if (targetSection === 'biblioteca') {
+                        aplicarFiltrosBiblioteca();
+                    }
+                }
+                
+                if (window.innerWidth < 768) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        // Funciones de archivos
+        inputDocumentacion.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            archivosSeleccionados = [...archivosSeleccionados, ...files];
+            mostrarArchivos();
+        });
+
+        function mostrarArchivos() {
+            listaArchivos.innerHTML = '';
+            archivosSeleccionados.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <span>${file.name} (${formatBytes(file.size)})</span>
+                    <button type="button" onclick="eliminarArchivo(${index})">Eliminar</button>
+                `;
+                listaArchivos.appendChild(fileItem);
+            });
+        }
+
+        function eliminarArchivo(index) {
+            archivosSeleccionados.splice(index, 1);
+            mostrarArchivos();
+        }
+
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        // Generar código de idea
+        function generarCodigo(departamento) {
+            const codigoDept = departamentos[departamento] || 'TI';
+            foliosPorDepartamento[codigoDept]++;
+            const folio = String(foliosPorDepartamento[codigoDept]).padStart(2, '0');
+            return `${codigoDept}-${folio}`;
+        }
+
+        // Formulario de registro
+        formRegistrar.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const ideaId = document.getElementById('ideaId').value;
+            const departamento = 'TECNOLOGÍAS DE INFORMACIÓN'; // Se obtendría del usuario logueado
+            
+            const datos = {
+                id: ideaId || idCounter++,
+                fecha: new Date().toLocaleDateString('es-MX'),
+                codigo: ideaId ? ideas.find(i => i.id == ideaId).codigo : generarCodigo(departamento),
+                colaborador: document.getElementById('nombreColaborador').value,
+                area: departamento,
+                puesto: 'Analista de Tecnologías',
+                fuenteGeneracion: document.getElementById('fuenteGeneracion').value,
+                descripcionIdea: document.getElementById('descripcionIdea').value,
+                situacionActual: document.getElementById('situacionActual').value,
+                impacto: document.getElementById('impacto').value,
+                estatus: 'Abierto',
+                archivos: [...archivosSeleccionados],
+                fechaISO: new Date().toISOString().split('T')[0],
+                comentario: ideaId ? ideas.find(i => i.id == ideaId).comentario : ''
+            };
+            
+            if (ideaId) {
+                // Modo edición
+                const index = ideas.findIndex(i => i.id == ideaId);
+                ideas[index] = datos;
+                mostrarMensaje('Idea actualizada exitosamente');
+            } else {
+                // Modo creación
+                ideas.push(datos);
+                mostrarMensaje('Idea de mejora registrada exitosamente');
+            }
+            
+            formRegistrar.reset();
+            document.getElementById('ideaId').value = '';
+            archivosSeleccionados = [];
+            mostrarArchivos();
+            modoEdicion = false;
+            btnSubmit.textContent = 'Registrar';
+            
+            // Aplicar filtros para actualizar la vista
+            aplicarFiltros();
+            aplicarFiltrosSeguimiento();
+            
+            // Redirigir a la sección de Mis Ideas
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById('ideas-registradas').classList.add('active');
+        });
+
+        btnCancelar.addEventListener('click', function() {
+            formRegistrar.reset();
+            document.getElementById('ideaId').value = '';
+            archivosSeleccionados = [];
+            mostrarArchivos();
+            modoEdicion = false;
+            btnSubmit.textContent = 'Registrar';
+        });
+
+        // Funciones de tabla de ideas
+        function actualizarTabla() {
+            tablaIdeasBody.innerHTML = '';
+            
+            if (ideasFiltradas.length === 0) {
+                if (ideas.length === 0) {
+                    mensajeVacio.textContent = 'No hay ideas registradas aún';
+                } else {
+                    mensajeVacio.textContent = 'No se encontraron resultados con los filtros aplicados';
+                }
+                mensajeVacio.classList.add('visible');
+                return;
+            }
+            
+            mensajeVacio.classList.remove('visible');
+            
+            ideasFiltradas.forEach(idea => {
+                const tr = document.createElement('tr');
+                
+                const estatusClass = idea.estatus.toLowerCase().replace(' ', '-');
+                
+                const documentosHtml = idea.archivos.length > 0 
+                    ? idea.archivos.map((archivo, index) => `
+                        <div class="documento-item">
+                            <span>📄</span>
+                            <a href="#" onclick="descargarArchivo(${idea.id}, ${index}); return false;">${archivo.name}</a>
+                        </div>
+                    `).join('')
+                    : '<span style="color: #999;">Sin documentos</span>';
+                
+                const estatusEmoji = idea.estatus === 'Abierto' ? '🟢' : '🔴';
+                
+                tr.innerHTML = `
+                    <td>${idea.fecha}</td>
+                    <td><strong>${idea.codigo}</strong></td>
+                    <td>${idea.colaborador}</td>
+                    <td>${idea.area}</td>
+                    <td>${idea.puesto}</td>
+                    <td>${idea.fuenteGeneracion}</td>
+                    <td class="descripcion-col">${idea.descripcionIdea}</td>
+                    <td class="situacion-col">${idea.situacionActual}</td>
+                    <td>${idea.impacto}</td>
+                    <td><span class="estatus-badge estatus-${estatusClass}">${estatusEmoji} ${idea.estatus}</span></td>
+                    <td><div class="documentos-lista">${documentosHtml}</div></td>
+                    <td>
+                        <div class="opciones-grupo">
+                            <button class="btn-opcion btn-editar" onclick="editarIdea(${idea.id})">✏️ Modificar</button>
+                            <button class="btn-opcion btn-eliminar" onclick="confirmarEliminar(${idea.id})">🗑️ Eliminar</button>
+                        </div>
+                    </td>
+                `;
+                
+                tablaIdeasBody.appendChild(tr);
+            });
+        }
+
+        function editarIdea(id) {
+            const idea = ideas.find(i => i.id === id);
+            if (!idea) return;
+            
+            document.getElementById('ideaId').value = idea.id;
+            document.getElementById('fuenteGeneracion').value = idea.fuenteGeneracion;
+            document.getElementById('descripcionIdea').value = idea.descripcionIdea;
+            document.getElementById('situacionActual').value = idea.situacionActual;
+            document.getElementById('impacto').value = idea.impacto;
+            archivosSeleccionados = [...idea.archivos];
+            mostrarArchivos();
+            
+            modoEdicion = true;
+            btnSubmit.textContent = 'Actualizar';
+            
+            // Cambiar a la sección de registro
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById('registrar-ideas').classList.add('active');
+            
+            // Scroll al inicio del formulario
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function confirmarEliminar(id) {
+            ideaAEliminar = id;
+            modalEliminar.classList.add('active');
+        }
+
+        btnCancelarEliminar.addEventListener('click', function() {
+            modalEliminar.classList.remove('active');
+            ideaAEliminar = null;
+        });
+
+        btnConfirmarEliminar.addEventListener('click', function() {
+            if (ideaAEliminar !== null) {
+                eliminarIdea(ideaAEliminar);
+                modalEliminar.classList.remove('active');
+                ideaAEliminar = null;
+            }
+        });
+
+        function eliminarIdea(id) {
+            ideas = ideas.filter(i => i.id !== id);
+            aplicarFiltros();
+            aplicarFiltrosSeguimiento();
+            mostrarMensaje('Idea eliminada exitosamente');
+        }
+
+        function descargarArchivo(ideaId, archivoIndex) {
+            const idea = ideas.find(i => i.id === ideaId);
+            if (idea && idea.archivos[archivoIndex]) {
+                const archivo = idea.archivos[archivoIndex];
+                mostrarMensaje(`Descargando: ${archivo.name}`);
+                // Aquí iría la lógica real de descarga
+            }
+        }
+
+        // Función de visualización
+        function visualizarIdea(id) {
+            const idea = ideas.find(i => i.id === id);
+            if (!idea) return;
+            
+            const documentosHtml = idea.archivos.length > 0 
+                ? idea.archivos.map((archivo, index) => `
+                    <div style="padding: 8px; background: #f0f0f0; border-radius: 4px; margin-top: 5px;">
+                        📄 ${archivo.name}
+                    </div>
+                `).join('')
+                : '<span style="color: #999;">Sin documentos adjuntos</span>';
+            
+            contenidoDetalleIdea.innerHTML = `
+                <div class="detalle-idea">
+                    <label>Fecha de Registro:</label>
+                    <div class="valor">${idea.fecha}</div>
+                </div>
+                
+                <div class="detalle-idea">
+                    <label>Código:</label>
+                    <div class="valor"><strong>${idea.codigo}</strong></div>
+                </div>
+                
+                <div class="detalle-idea">
+                    <label>Colaborador:</label>
+                    <div class="valor">${idea.colaborador}</div>
+                </div>
+                
+                <div class="detalle-idea">
+                    <label>Área:</label>
+                    <div class="valor">${idea.area}</div>
+                </div>
+                
+                <div class="detalle-idea">
+                    <label>Puesto:</label>
+                    <div class="valor">${idea.puesto}</div>
+                </div>
+                
+                <div class="detalle-idea">
+                    <label>Fuente de Generación:</label>
+                    <div class="valor">${idea.fuenteGeneracion}</div>
+                </div>
+                
+                <div class="detalle-idea">
+                    <label>Descripción de la Idea:</label>
+                    <div class="valor">${idea.descripcionIdea}</div>
+                </div>
+                
+                <div class="detalle-idea">
+                    <label>Situación Actual:</label>
+                    <div class="valor">${idea.situacionActual}</div>
+                </div>
+                
+                <div class="detalle-idea">
+                    <label>Impacto:</label>
+                    <div class="valor">${idea.impacto}</div>
+                </div>
+                
+                <div class="detalle-idea">
+                    <label>Estatus:</label>
+                    <div class="valor"><span class="estatus-badge estatus-${idea.estatus.toLowerCase()}">${idea.estatus === 'Abierto' ? '🟢' : '🔴'} ${idea.estatus}</span></div>
+                </div>
+                
+                <div class="detalle-idea">
+                    <label>Documentación:</label>
+                    <div class="valor">${documentosHtml}</div>
+                </div>
+            `;
+            
+            modalVisualizarIdea.classList.add('active');
+        }
+
+        btnCerrarVisualizar.addEventListener('click', function() {
+            modalVisualizarIdea.classList.remove('active');
+        });
+
+        // Poblar departamentos implementadores
+        function poblarDepartamentosImplementadores() {
+            const departamentosUnicos = [...new Set(catalogoAreas.map(a => a.departamento))];
+            departamentoImplementador.innerHTML = '<option value="">Seleccione un departamento</option>';
+            
+            departamentosUnicos.forEach(dept => {
+                const option = document.createElement('option');
+                option.value = dept;
+                option.textContent = dept;
+                departamentoImplementador.appendChild(option);
+            });
+        }
+
+        // Mostrar/ocultar campo de departamento implementador
+        radioAprobado.addEventListener('change', function() {
+            if (this.checked) {
+                grupoDepartamentoImplementador.style.display = 'block';
+                departamentoImplementador.required = true;
+            }
+        });
+
+        radioNoAprobado.addEventListener('change', function() {
+            if (this.checked) {
+                grupoDepartamentoImplementador.style.display = 'none';
+                departamentoImplementador.required = false;
+                departamentoImplementador.value = '';
+            }
+        });
+
+        // Función para abrir modal de seguimiento
+        function abrirSeguimiento(ideaId) {
+            const idea = ideas.find(i => i.id === ideaId);
+            if (!idea) return;
+            
+            document.getElementById('seguimientoIdeaId').value = idea.id;
+            codigoIdeaSeguimiento.textContent = idea.codigo;
+            
+            // Si ya tiene seguimiento, cargar los datos
+            if (idea.seguimiento) {
+                if (idea.seguimiento.aprobado) {
+                    radioAprobado.checked = true;
+                    grupoDepartamentoImplementador.style.display = 'block';
+                    departamentoImplementador.required = true;
+                    departamentoImplementador.value = idea.seguimiento.departamentoImplementador || '';
+                } else {
+                    radioNoAprobado.checked = true;
+                    grupoDepartamentoImplementador.style.display = 'none';
+                    departamentoImplementador.required = false;
+                }
+                btnGuardarSeguimiento.textContent = 'Actualizar';
+            } else {
+                formSeguimiento.reset();
+                grupoDepartamentoImplementador.style.display = 'none';
+                departamentoImplementador.required = false;
+                btnGuardarSeguimiento.textContent = 'Guardar';
+            }
+            
+            poblarDepartamentosImplementadores();
+            modalSeguimiento.classList.add('active');
+        }
+
+        btnCancelarSeguimiento.addEventListener('click', function() {
+            modalSeguimiento.classList.remove('active');
+            formSeguimiento.reset();
+        });
+
+        formSeguimiento.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const ideaId = parseInt(document.getElementById('seguimientoIdeaId').value);
+            const idea = ideas.find(i => i.id === ideaId);
+            if (!idea) return;
+            
+            const aprobado = radioAprobado.checked;
+            
+            idea.seguimiento = {
+                aprobado: aprobado,
+                departamentoImplementador: aprobado ? departamentoImplementador.value : null,
+                fechaSeguimiento: new Date().toLocaleDateString('es-MX')
+            };
+            
+            if (aprobado) {
+                mostrarMensaje(`✅ Idea ${idea.codigo} aprobada - Implementador: ${idea.seguimiento.departamentoImplementador}`);
+            } else {
+                mostrarMensaje(`❌ Idea ${idea.codigo} no aprobada`);
+            }
+            
+            modalSeguimiento.classList.remove('active');
+            formSeguimiento.reset();
+            
+            // Actualizar tabla de seguimiento
+            aplicarFiltrosSeguimiento();
+            
+            // Actualizar tabla de agregar acciones
+            aplicarFiltrosAcciones();
+        });
+
+        // Funciones para Agregar Acciones
+        busquedaAcciones.addEventListener('input', aplicarFiltrosAcciones);
+        
+        btnLimpiarBusquedaAcciones.addEventListener('click', function() {
+            busquedaAcciones.value = '';
+            aplicarFiltrosAcciones();
+        });
+
+        function aplicarFiltrosAcciones() {
+            const textoBusqueda = busquedaAcciones.value.toLowerCase().trim();
+            
+            // Filtrar solo ideas aprobadas
+            ideasAprobadasFiltradas = ideas.filter(idea => {
+                const esAprobada = idea.seguimiento && idea.seguimiento.aprobado;
+                
+                if (!esAprobada) return false;
+                
+                if (!textoBusqueda) return true;
+                
+                return (
+                    idea.codigo.toLowerCase().includes(textoBusqueda) ||
+                    idea.seguimiento.departamentoImplementador.toLowerCase().includes(textoBusqueda) ||
+                    idea.colaborador.toLowerCase().includes(textoBusqueda) ||
+                    idea.descripcionIdea.toLowerCase().includes(textoBusqueda)
+                );
+            });
+            
+            actualizarTablaAcciones();
+            actualizarContadorAcciones();
+        }
+
+        function actualizarTablaAcciones() {
+            tablaAccionesBody.innerHTML = '';
+            
+            if (ideasAprobadasFiltradas.length === 0) {
+                const totalAprobadas = ideas.filter(i => i.seguimiento && i.seguimiento.aprobado).length;
+                if (totalAprobadas === 0) {
+                    mensajeVacioAcciones.textContent = 'No hay ideas aprobadas pendientes de acciones de implementación';
+                } else {
+                    mensajeVacioAcciones.textContent = 'No se encontraron resultados con los filtros aplicados';
+                }
+                mensajeVacioAcciones.classList.add('visible');
+                return;
+            }
+            
+            mensajeVacioAcciones.classList.remove('visible');
+            
+            ideasAprobadasFiltradas.forEach(idea => {
+                const tr = document.createElement('tr');
+                
+                tr.innerHTML = `
+                    <td><strong>${idea.codigo}</strong></td>
+                    <td>${idea.colaborador}</td>
+                    <td class="descripcion-col">${idea.descripcionIdea}</td>
+                    <td><span style="background: #1a237e; color: white; padding: 6px 12px; border-radius: 4px; font-weight: 600; display: inline-block;">${idea.seguimiento.departamentoImplementador}</span></td>
+                    <td>
+                        <div class="opciones-grupo">
+                            <button class="btn-opcion" style="background: #4caf50;" onclick="irAAccionesImplementacion(${idea.id})">🎯 Gestionar Acciones</button>
+                        </div>
+                    </td>
+                `;
+                
+                tablaAccionesBody.appendChild(tr);
+            });
+        }
+
+        function actualizarContadorAcciones() {
+            const total = ideas.filter(i => i.seguimiento && i.seguimiento.aprobado).length;
+            contadorAcciones.innerHTML = `Mostrando <strong>${ideasAprobadasFiltradas.length}</strong> de <strong>${total}</strong> ideas aprobadas`;
+        }
+
+        function irAAccionesImplementacion(ideaId) {
+            const idea = ideas.find(i => i.id === ideaId);
+            if (!idea) return;
+            
+            // Guardar ID de idea actual en gestión
+            localStorage.setItem('ideaEnGestion', ideaId);
+            
+            // Cargar información de la idea
+            document.getElementById('codigoIdeaGestion').textContent = idea.codigo;
+            document.getElementById('colaboradorIdeaGestion').textContent = idea.colaborador;
+            document.getElementById('departamentoImplementadorGestion').textContent = idea.seguimiento.departamentoImplementador;
+            document.getElementById('descripcionIdeaGestion').textContent = idea.descripcionIdea;
+            document.getElementById('ideaIdAccion').value = ideaId;
+            
+            // Inicializar acciones si no existen
+            if (!idea.acciones) {
+                idea.acciones = [];
+            }
+            
+            // Mostrar sección de gestión
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById('gestion-acciones').classList.add('active');
+            
+            // Renderizar lista de acciones
+            renderizarListaAcciones(idea);
+        }
+
+        function volverAgregarAcciones() {
+            localStorage.removeItem('ideaEnGestion');
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById('agregar-acciones').classList.add('active');
+        }
+
+        // Formulario de agregar acción
+        const formAgregarAccion = document.getElementById('formAgregarAccion');
+        
+        formAgregarAccion.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const ideaId = parseInt(document.getElementById('ideaIdAccion').value);
+            const idea = ideas.find(i => i.id === ideaId);
+            if (!idea) return;
+            
+            if (!idea.acciones) {
+                idea.acciones = [];
+            }
+            
+            const nuevaAccion = {
+                id: Date.now(),
+                descripcion: document.getElementById('accionDescripcion').value,
+                responsable: document.getElementById('accionResponsable').value,
+                fechaCompromiso: document.getElementById('accionFechaCompromiso').value,
+                cumplida: null, // null = pendiente, true = sí, false = no
+                observaciones: '',
+                fechaCreacion: new Date().toLocaleDateString('es-MX')
+            };
+            
+            idea.acciones.push(nuevaAccion);
+            
+            // Limpiar formulario
+            formAgregarAccion.reset();
+            document.getElementById('ideaIdAccion').value = ideaId;
+            
+            // Renderizar lista actualizada
+            renderizarListaAcciones(idea);
+            
+            mostrarMensaje('✅ Acción agregada exitosamente');
+        });
+
+        function renderizarListaAcciones(idea) {
+            const listaAcciones = document.getElementById('listaAcciones');
+            
+            if (!idea.acciones || idea.acciones.length === 0) {
+                listaAcciones.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #999;">
+                        No hay acciones registradas aún. Agrega la primera acción usando el formulario de arriba.
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            
+            idea.acciones.forEach((accion, index) => {
+                const siguienteAccion = idea.acciones[index + 1];
+                const esBloqueada = accion.cumplida !== true && siguienteAccion;
+                const esCompletada = accion.cumplida === true;
+                
+                const estadoBadge = esCompletada 
+                    ? '<span class="badge-estado badge-completada">✅ Completada</span>'
+                    : '<span class="badge-estado badge-pendiente">⏳ Pendiente</span>';
+                
+                const cardClass = esCompletada ? 'accion-card completada' : 'accion-card';
+                
+                const cumplimientoDisabled = esCompletada ? 'disabled' : '';
+                const observacionesDisabled = esCompletada ? 'disabled' : '';
+                
+                html += `
+                    <div class="${cardClass}" id="accion-${accion.id}">
+                        <div class="accion-header">
+                            <div class="accion-numero">Acción #${index + 1}</div>
+                            <div class="accion-estado">
+                                ${estadoBadge}
+                            </div>
+                        </div>
+                        
+                        <div class="accion-body">
+                            <div class="accion-campo" style="grid-column: 1 / -1;">
+                                <label>Descripción de la Acción</label>
+                                <div class="valor">${accion.descripcion}</div>
+                            </div>
+                            
+                            <div class="accion-campo">
+                                <label>Colaborador Responsable</label>
+                                <div class="valor">${accion.responsable}</div>
+                            </div>
+                            
+                            <div class="accion-campo">
+                                <label>Fecha Compromiso</label>
+                                <div class="valor">${new Date(accion.fechaCompromiso).toLocaleDateString('es-MX')}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="accion-cumplimiento">
+                            <label>¿Se cumple con la implementación?</label>
+                            <div class="radio-group">
+                                <label class="radio-option si">
+                                    <input type="radio" name="cumplimiento-${accion.id}" value="si" 
+                                        ${accion.cumplida === true ? 'checked' : ''} 
+                                        ${cumplimientoDisabled}
+                                        onchange="marcarCumplimiento(${idea.id}, ${accion.id}, true)">
+                                    <span>✅ Sí</span>
+                                </label>
+                                <label class="radio-option no">
+                                    <input type="radio" name="cumplimiento-${accion.id}" value="no" 
+                                        ${accion.cumplida === false ? 'checked' : ''} 
+                                        ${cumplimientoDisabled}
+                                        onchange="marcarCumplimiento(${idea.id}, ${accion.id}, false)">
+                                    <span>❌ No</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; font-weight: 600; color: #333; margin-bottom: 8px; font-size: 14px;">
+                                Observaciones Generales
+                            </label>
+                            <textarea 
+                                class="accion-observaciones" 
+                                placeholder="Escribe observaciones sobre esta acción..."
+                                ${observacionesDisabled}
+                                onblur="guardarObservaciones(${idea.id}, ${accion.id}, this.value)"
+                            >${accion.observaciones}</textarea>
+                        </div>
+                    </div>
+                `;
+                
+                // Si la siguiente acción está bloqueada, agregar la tarjeta bloqueada
+                if (siguienteAccion && accion.cumplida !== true) {
+                    const siguienteIndex = index + 1;
+                    html += `
+                        <div class="accion-card bloqueada" style="position: relative;">
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 10; background: rgba(255,255,255,0.95); padding: 20px; border-radius: 8px; border: 2px solid #ff9800;">
+                                <div style="font-size: 48px; margin-bottom: 10px;">🔒</div>
+                                <div style="font-weight: 700; color: #333; font-size: 16px;">Acción Bloqueada</div>
+                                <div style="color: #666; font-size: 14px; margin-top: 5px;">Completa la Acción #${index + 1} para habilitar esta acción</div>
+                            </div>
+                            <div class="accion-header">
+                                <div class="accion-numero">Acción #${siguienteIndex + 1}</div>
+                                <div class="accion-estado">
+                                    <span class="badge-estado" style="background: #e0e0e0; color: #666;">🔒 Bloqueada</span>
+                                </div>
+                            </div>
+                            
+                            <div class="accion-body">
+                                <div class="accion-campo" style="grid-column: 1 / -1;">
+                                    <label>Descripción de la Acción</label>
+                                    <div class="valor">${siguienteAccion.descripcion}</div>
+                                </div>
+                                
+                                <div class="accion-campo">
+                                    <label>Colaborador Responsable</label>
+                                    <div class="valor">${siguienteAccion.responsable}</div>
+                                </div>
+                                
+                                <div class="accion-campo">
+                                    <label>Fecha Compromiso</label>
+                                    <div class="valor">${new Date(siguienteAccion.fechaCompromiso).toLocaleDateString('es-MX')}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="accion-cumplimiento">
+                                <label>¿Se cumple con la implementación?</label>
+                                <div class="radio-group">
+                                    <label class="radio-option si">
+                                        <input type="radio" disabled>
+                                        <span>✅ Sí</span>
+                                    </label>
+                                    <label class="radio-option no">
+                                        <input type="radio" disabled>
+                                        <span>❌ No</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label style="display: block; font-weight: 600; color: #333; margin-bottom: 8px; font-size: 14px;">
+                                    Observaciones Generales
+                                </label>
+                                <textarea class="accion-observaciones" disabled placeholder="Bloqueado hasta completar acción anterior"></textarea>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Romper el ciclo para no mostrar más acciones bloqueadas
+                    return;
+                }
+            });
+            
+            listaAcciones.innerHTML = html;
+        }
+
+        function marcarCumplimiento(ideaId, accionId, cumplida) {
+            const idea = ideas.find(i => i.id === ideaId);
+            if (!idea) return;
+            
+            const accion = idea.acciones.find(a => a.id === accionId);
+            if (!accion) return;
+            
+            accion.cumplida = cumplida;
+            
+            if (cumplida) {
+                mostrarMensaje(`✅ Acción marcada como completada - Se habilita la siguiente acción`);
+            } else {
+                mostrarMensaje(`❌ Acción marcada como NO completada`);
+            }
+            
+            // Re-renderizar lista
+            renderizarListaAcciones(idea);
+        }
+
+        function guardarObservaciones(ideaId, accionId, observaciones) {
+            const idea = ideas.find(i => i.id === ideaId);
+            if (!idea) return;
+            
+            const accion = idea.acciones.find(a => a.id === accionId);
+            if (!accion) return;
+            
+            accion.observaciones = observaciones;
+            
+            mostrarMensaje('💬 Observaciones guardadas');
+        }
+
+        // Funciones para gestión de usuarios y perfiles (ORDENADOS A-Z por departamento)
+        function actualizarTablaPerfiles() {
+            tablaPerfilesBody.innerHTML = '';
+            cambiosPendientes = {};
+            
+            // Ordenar por departamento (A-Z)
+            const usuariosOrdenados = [...usuariosFiltrados].sort((a, b) => {
+                return a.departamento.localeCompare(b.departamento);
+            });
+            
+            usuariosOrdenados.forEach(usuario => {
+                const tr = document.createElement('tr');
+                const perfilClass = `perfil-${usuario.perfil.toLowerCase()}`;
+                
+                tr.innerHTML = `
+                    <td><strong>#${usuario.id}</strong></td>
+                    <td>${usuario.departamento}</td>
+                    <td>${usuario.area}</td>
+                    <td>${usuario.puesto}</td>
+                    <td><span class="perfil-badge ${perfilClass}">${usuario.perfil}</span></td>
+                    <td><strong>${usuario.prefijo}</strong></td>
+                    <td>
+                        <select class="select-perfil" id="selectPerfil${usuario.id}" onchange="cambiarPerfil(${usuario.id}, this.value)">
+                            <option value="MASTER" ${usuario.perfil === 'MASTER' ? 'selected' : ''}>Master</option>
+                            <option value="ADMINISTRADOR" ${usuario.perfil === 'ADMINISTRADOR' ? 'selected' : ''}>Administrador</option>
+                            <option value="GERENTE" ${usuario.perfil === 'GERENTE' ? 'selected' : ''}>Gerente</option>
+                            <option value="COLABORADOR" ${usuario.perfil === 'COLABORADOR' ? 'selected' : ''}>Colaborador</option>
+                        </select>
+                    </td>
+                    <td>
+                        <div class="acciones-perfil">
+                            <button class="btn-guardar-perfil" id="btnGuardar${usuario.id}" onclick="guardarCambioPerfil(${usuario.id})" disabled>   Guardar</button>
+                        </div>
+                    </td>
+                `;
+                
+                tablaPerfilesBody.appendChild(tr);
+            });
+        }
+
+        function cambiarPerfil(usuarioId, nuevoPerfil) {
+            const usuario = usuarios.find(u => u.id === usuarioId);
+            if (!usuario) return;
+            
+            const btnGuardar = document.getElementById(`btnGuardar${usuarioId}`);
+            
+            if (usuario.perfil !== nuevoPerfil) {
+                cambiosPendientes[usuarioId] = nuevoPerfil;
+                btnGuardar.disabled = false;
+            } else {
+                delete cambiosPendientes[usuarioId];
+                btnGuardar.disabled = true;
+            }
+        }
+
+        function guardarCambioPerfil(usuarioId) {
+            const usuario = usuarios.find(u => u.id === usuarioId);
+            if (!usuario || !cambiosPendientes[usuarioId]) return;
+            
+            const perfilAnterior = usuario.perfil;
+            const nuevoPerfilValor = cambiosPendientes[usuarioId];
+            usuario.perfil = nuevoPerfilValor;
+            
+            mostrarMensaje(`Perfil actualizado de ${perfilAnterior} a ${nuevoPerfilValor}`);
+            
+            // Re-filtrar para mantener el filtro activo
+            filtrarUsuarios();
+        }
+
+        // Poblar select de departamentos
+        function poblarDepartamentos() {
+            const selectDept = document.getElementById('usuarioDepartamento');
+            const departamentosUnicos = [...new Set(catalogoAreas.map(a => a.departamento))];
+            
+            departamentosUnicos.forEach(dept => {
+                const option = document.createElement('option');
+                option.value = dept;
+                option.textContent = dept;
+                selectDept.appendChild(option);
+            });
+        }
+
+        // Al cambiar departamento, poblar áreas
+        document.getElementById('usuarioDepartamento').addEventListener('change', function() {
+            const selectArea = document.getElementById('usuarioArea');
+            const deptSeleccionado = this.value;
+            
+            selectArea.innerHTML = '<option value="">Seleccione un área</option>';
+            selectArea.disabled = !deptSeleccionado;
+            
+            if (deptSeleccionado) {
+                const areasFiltradas = catalogoAreas.filter(a => a.departamento === deptSeleccionado);
+                areasFiltradas.forEach(areaData => {
+                    const option = document.createElement('option');
+                    option.value = areaData.area;
+                    option.textContent = areaData.area;
+                    option.dataset.prefijo = areaData.prefijo;
+                    selectArea.appendChild(option);
+                });
+            }
+        });
+
+        btnAgregarUsuario.addEventListener('click', function() {
+            modoEdicionUsuario = false;
+            tituloModalUsuario.textContent = 'Agregar Nuevo Usuario';
+            formUsuario.reset();
+            document.getElementById('usuarioId').value = '';
+            document.getElementById('usuarioArea').disabled = true;
+            poblarDepartamentos();
+            modalUsuario.classList.add('active');
+        });
+
+        btnCancelarUsuario.addEventListener('click', function() {
+            modalUsuario.classList.remove('active');
+            formUsuario.reset();
+        });
+
+        formUsuario.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const usuarioId = document.getElementById('usuarioId').value;
+            const areaSeleccionada = document.getElementById('usuarioArea');
+            const prefijo = areaSeleccionada.selectedOptions[0]?.dataset.prefijo || '';
+            
+            const datos = {
+                id: usuarioId || usuarioIdCounter++,
+                departamento: document.getElementById('usuarioDepartamento').value,
+                area: areaSeleccionada.value,
+                puesto: document.getElementById('usuarioPuesto').value.toUpperCase(),
+                perfil: document.getElementById('usuarioPerfil').value,
+                prefijo: prefijo
+            };
+            
+            if (usuarioId) {
+                // Modo edición
+                const index = usuarios.findIndex(u => u.id == usuarioId);
+                usuarios[index] = datos;
+                mostrarMensaje('Usuario actualizado exitosamente');
+            } else {
+                // Modo creación
+                usuarios.push(datos);
+                mostrarMensaje(`Usuario en ${datos.puesto} agregado exitosamente con perfil ${datos.perfil}`);
+            }
+            
+            modalUsuario.classList.remove('active');
+            formUsuario.reset();
+            
+            // Re-filtrar para mantener el filtro activo
+            filtrarUsuarios();
+        });
+
+        // Utilidades
+        function mostrarMensaje(mensaje) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: #1a237e;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 4px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                max-width: 400px;
+            `;
+            toast.textContent = mensaje;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Variables de filtros
+        let ideasFiltradas = [];
+        let ideasFiltradasBiblioteca = [];
+
+        // Elementos de filtros
+        const filtroBusquedaPor = document.getElementById('filtroBusquedaPor');
+        const filtroBusqueda = document.getElementById('filtroBusqueda');
+        const filtroEstatus = document.getElementById('filtroEstatus');
+        const filtroFechaTipo = document.getElementById('filtroFechaTipo');
+        const filtroMes = document.getElementById('filtroMes');
+        const filtroFechaEspecifica = document.getElementById('filtroFechaEspecifica');
+        const filtroFechaDesde = document.getElementById('filtroFechaDesde');
+        const filtroFechaHasta = document.getElementById('filtroFechaHasta');
+        const btnLimpiarFiltros = document.getElementById('btnLimpiarFiltros');
+        const contadorRegistros = document.getElementById('contadorRegistros');
+
+        // Elementos de filtros para Biblioteca
+        const filtroBusquedaPorBiblioteca = document.getElementById('filtroBusquedaPorBiblioteca');
+        const filtroBusquedaBiblioteca = document.getElementById('filtroBusquedaBiblioteca');
+        const filtroFechaTipoBiblioteca = document.getElementById('filtroFechaTipoBiblioteca');
+        const filtroMesBiblioteca = document.getElementById('filtroMesBiblioteca');
+        const filtroFechaEspecificaBiblioteca = document.getElementById('filtroFechaEspecificaBiblioteca');
+        const filtroFechaDesdeBiblioteca = document.getElementById('filtroFechaDesdeBiblioteca');
+        const filtroFechaHastaBiblioteca = document.getElementById('filtroFechaHastaBiblioteca');
+        const btnLimpiarFiltrosBiblioteca = document.getElementById('btnLimpiarFiltrosBiblioteca');
+        const contadorRegistrosBiblioteca = document.getElementById('contadorRegistrosBiblioteca');
+        const tablaIdeasBibliotecaBody = document.getElementById('tablaIdeasBibliotecaBody');
+        const mensajeVacioBiblioteca = document.getElementById('mensajeVacioBiblioteca');
+
+        // Elementos de filtros para Seguimiento
+        const filtroBusquedaPorSeguimiento = document.getElementById('filtroBusquedaPorSeguimiento');
+        const filtroBusquedaSeguimiento = document.getElementById('filtroBusquedaSeguimiento');
+        const filtroEstatusSeguimiento = document.getElementById('filtroEstatusSeguimiento');
+        const filtroEstatusImplementacion = document.getElementById('filtroEstatusImplementacion');
+        const btnLimpiarFiltrosSeguimiento = document.getElementById('btnLimpiarFiltrosSeguimiento');
+        const contadorRegistrosSeguimiento = document.getElementById('contadorRegistrosSeguimiento');
+        const tablaSeguimientoBody = document.getElementById('tablaSeguimientoBody');
+        const mensajeVacioSeguimiento = document.getElementById('mensajeVacioSeguimiento');
+        
+        let ideasFiltradasSeguimiento = [];
+
+        // Mostrar/ocultar campos de fecha según el tipo seleccionado
+        filtroFechaTipo.addEventListener('change', function() {
+            document.getElementById('grupoMes').style.display = 'none';
+            document.getElementById('grupoFechaEspecifica').style.display = 'none';
+            document.getElementById('grupoFechaDesde').style.display = 'none';
+            document.getElementById('grupoFechaHasta').style.display = 'none';
+            
+            filtroMes.value = '';
+            filtroFechaEspecifica.value = '';
+            filtroFechaDesde.value = '';
+            filtroFechaHasta.value = '';
+            
+            switch(this.value) {
+                case 'mes':
+                    document.getElementById('grupoMes').style.display = 'flex';
+                    break;
+                case 'fecha':
+                    document.getElementById('grupoFechaEspecifica').style.display = 'flex';
+                    break;
+                case 'rango':
+                    document.getElementById('grupoFechaDesde').style.display = 'flex';
+                    document.getElementById('grupoFechaHasta').style.display = 'flex';
+                    break;
+            }
+            
+            aplicarFiltros();
+        });
+
+        // Event listeners para filtros en tiempo real
+        filtroBusquedaPor.addEventListener('change', aplicarFiltros);
+        filtroBusqueda.addEventListener('input', aplicarFiltros);
+        filtroEstatus.addEventListener('change', aplicarFiltros);
+        filtroMes.addEventListener('change', aplicarFiltros);
+        filtroFechaEspecifica.addEventListener('change', aplicarFiltros);
+        filtroFechaDesde.addEventListener('change', aplicarFiltros);
+        filtroFechaHasta.addEventListener('change', aplicarFiltros);
+
+        // Limpiar filtros
+        btnLimpiarFiltros.addEventListener('click', function() {
+            filtroBusquedaPor.value = 'todas';
+            filtroBusqueda.value = '';
+            filtroEstatus.value = 'todos';
+            filtroFechaTipo.value = 'todos';
+            filtroMes.value = '';
+            filtroFechaEspecifica.value = '';
+            filtroFechaDesde.value = '';
+            filtroFechaHasta.value = '';
+            
+            document.getElementById('grupoMes').style.display = 'none';
+            document.getElementById('grupoFechaEspecifica').style.display = 'none';
+            document.getElementById('grupoFechaDesde').style.display = 'none';
+            document.getElementById('grupoFechaHasta').style.display = 'none';
+            
+            aplicarFiltros();
+        });
+
+        function aplicarFiltros() {
+            const busquedaPor = filtroBusquedaPor.value;
+            const textoBusqueda = filtroBusqueda.value.toLowerCase().trim();
+            const estatus = filtroEstatus.value;
+            const fechaTipo = filtroFechaTipo.value;
+            
+            ideasFiltradas = ideas.filter(idea => {
+                // Filtro de búsqueda
+                let cumpleBusqueda = true;
+                if (textoBusqueda) {
+                    if (busquedaPor === 'todas') {
+                        cumpleBusqueda = 
+                            idea.codigo.toLowerCase().includes(textoBusqueda) ||
+                            idea.colaborador.toLowerCase().includes(textoBusqueda) ||
+                            idea.area.toLowerCase().includes(textoBusqueda) ||
+                            idea.puesto.toLowerCase().includes(textoBusqueda) ||
+                            idea.fuenteGeneracion.toLowerCase().includes(textoBusqueda) ||
+                            idea.descripcionIdea.toLowerCase().includes(textoBusqueda) ||
+                            idea.impacto.toLowerCase().includes(textoBusqueda);
+                    } else {
+                        cumpleBusqueda = idea[busquedaPor].toLowerCase().includes(textoBusqueda);
+                    }
+                }
+                
+                // Filtro de estatus
+                const cumpleEstatus = estatus === 'todos' || idea.estatus === estatus;
+                
+                // Filtro de fecha
+                let cumpleFecha = true;
+                if (fechaTipo !== 'todos' && idea.fechaISO) {
+                    const fechaIdea = idea.fechaISO;
+                    
+                    switch(fechaTipo) {
+                        case 'mes':
+                            if (filtroMes.value) {
+                                const mesSeleccionado = filtroMes.value;
+                                cumpleFecha = fechaIdea.substring(0, 7) === mesSeleccionado;
+                            }
+                            break;
+                        case 'fecha':
+                            if (filtroFechaEspecifica.value) {
+                                cumpleFecha = fechaIdea === filtroFechaEspecifica.value;
+                            }
+                            break;
+                        case 'rango':
+                            const desde = filtroFechaDesde.value;
+                            const hasta = filtroFechaHasta.value;
+                            if (desde && hasta) {
+                                cumpleFecha = fechaIdea >= desde && fechaIdea <= hasta;
+                            } else if (desde) {
+                                cumpleFecha = fechaIdea >= desde;
+                            } else if (hasta) {
+                                cumpleFecha = fechaIdea <= hasta;
+                            }
+                            break;
+                    }
+                }
+                
+                return cumpleBusqueda && cumpleEstatus && cumpleFecha;
+            });
+            
+            actualizarTabla();
+            actualizarContador();
+        }
+
+        function actualizarContador() {
+            const total = ideas.length;
+            const mostrados = ideasFiltradas.length;
+            contadorRegistros.innerHTML = `Mostrando <strong>${mostrados}</strong> de <strong>${total}</strong> registros`;
+        }
+
+        // Mostrar/ocultar campos de fecha según el tipo seleccionado (Biblioteca)
+        filtroFechaTipoBiblioteca.addEventListener('change', function() {
+            document.getElementById('grupoMesBiblioteca').style.display = 'none';
+            document.getElementById('grupoFechaEspecificaBiblioteca').style.display = 'none';
+            document.getElementById('grupoFechaDesdeBiblioteca').style.display = 'none';
+            document.getElementById('grupoFechaHastaBiblioteca').style.display = 'none';
+            
+            filtroMesBiblioteca.value = '';
+            filtroFechaEspecificaBiblioteca.value = '';
+            filtroFechaDesdeBiblioteca.value = '';
+            filtroFechaHastaBiblioteca.value = '';
+            
+            switch(this.value) {
+                case 'mes':
+                    document.getElementById('grupoMesBiblioteca').style.display = 'flex';
+                    break;
+                case 'fecha':
+                    document.getElementById('grupoFechaEspecificaBiblioteca').style.display = 'flex';
+                    break;
+                case 'rango':
+                    document.getElementById('grupoFechaDesdeBiblioteca').style.display = 'flex';
+                    document.getElementById('grupoFechaHastaBiblioteca').style.display = 'flex';
+                    break;
+            }
+            
+            aplicarFiltrosBiblioteca();
+        });
+
+        // Event listeners para filtros en tiempo real (Biblioteca)
+        filtroBusquedaPorBiblioteca.addEventListener('change', aplicarFiltrosBiblioteca);
+        filtroBusquedaBiblioteca.addEventListener('input', aplicarFiltrosBiblioteca);
+        filtroMesBiblioteca.addEventListener('change', aplicarFiltrosBiblioteca);
+        filtroFechaEspecificaBiblioteca.addEventListener('change', aplicarFiltrosBiblioteca);
+        filtroFechaDesdeBiblioteca.addEventListener('change', aplicarFiltrosBiblioteca);
+        filtroFechaHastaBiblioteca.addEventListener('change', aplicarFiltrosBiblioteca);
+
+        // Limpiar filtros (Biblioteca)
+        btnLimpiarFiltrosBiblioteca.addEventListener('click', function() {
+            filtroBusquedaPorBiblioteca.value = 'todas';
+            filtroBusquedaBiblioteca.value = '';
+            filtroFechaTipoBiblioteca.value = 'todos';
+            filtroMesBiblioteca.value = '';
+            filtroFechaEspecificaBiblioteca.value = '';
+            filtroFechaDesdeBiblioteca.value = '';
+            filtroFechaHastaBiblioteca.value = '';
+            
+            document.getElementById('grupoMesBiblioteca').style.display = 'none';
+            document.getElementById('grupoFechaEspecificaBiblioteca').style.display = 'none';
+            document.getElementById('grupoFechaDesdeBiblioteca').style.display = 'none';
+            document.getElementById('grupoFechaHastaBiblioteca').style.display = 'none';
+            
+            aplicarFiltrosBiblioteca();
+        });
+
+        // Función para aplicar filtros en Biblioteca (solo ideas cerradas)
+        function aplicarFiltrosBiblioteca() {
+            const busquedaPor = filtroBusquedaPorBiblioteca.value;
+            const textoBusqueda = filtroBusquedaBiblioteca.value.toLowerCase().trim();
+            const fechaTipo = filtroFechaTipoBiblioteca.value;
+            
+            ideasFiltradasBiblioteca = ideas.filter(idea => {
+                // FILTRO PRINCIPAL: Solo ideas con estatus Cerrado
+                if (idea.estatus !== 'Cerrado') {
+                    return false;
+                }
+                
+                // Filtro de búsqueda
+                let cumpleBusqueda = true;
+                if (textoBusqueda) {
+                    if (busquedaPor === 'todas') {
+                        cumpleBusqueda = 
+                            idea.codigo.toLowerCase().includes(textoBusqueda) ||
+                            idea.colaborador.toLowerCase().includes(textoBusqueda) ||
+                            idea.area.toLowerCase().includes(textoBusqueda) ||
+                            idea.puesto.toLowerCase().includes(textoBusqueda) ||
+                            idea.fuenteGeneracion.toLowerCase().includes(textoBusqueda) ||
+                            idea.descripcionIdea.toLowerCase().includes(textoBusqueda) ||
+                            idea.impacto.toLowerCase().includes(textoBusqueda);
+                    } else {
+                        cumpleBusqueda = idea[busquedaPor].toLowerCase().includes(textoBusqueda);
+                    }
+                }
+                
+                // Filtro de fecha
+                let cumpleFecha = true;
+                if (fechaTipo !== 'todos' && idea.fechaISO) {
+                    const fechaIdea = idea.fechaISO;
+                    
+                    switch(fechaTipo) {
+                        case 'mes':
+                            if (filtroMesBiblioteca.value) {
+                                const mesSeleccionado = filtroMesBiblioteca.value;
+                                cumpleFecha = fechaIdea.substring(0, 7) === mesSeleccionado;
+                            }
+                            break;
+                        case 'fecha':
+                            if (filtroFechaEspecificaBiblioteca.value) {
+                                cumpleFecha = fechaIdea === filtroFechaEspecificaBiblioteca.value;
+                            }
+                            break;
+                        case 'rango':
+                            const desde = filtroFechaDesdeBiblioteca.value;
+                            const hasta = filtroFechaHastaBiblioteca.value;
+                            if (desde && hasta) {
+                                cumpleFecha = fechaIdea >= desde && fechaIdea <= hasta;
+                            } else if (desde) {
+                                cumpleFecha = fechaIdea >= desde;
+                            } else if (hasta) {
+                                cumpleFecha = fechaIdea <= hasta;
+                            }
+                            break;
+                    }
+                }
+                
+                return cumpleBusqueda && cumpleFecha;
+            });
+            
+            actualizarTablaBiblioteca();
+            actualizarContadorBiblioteca();
+        }
+
+        function actualizarTablaBiblioteca() {
+            tablaIdeasBibliotecaBody.innerHTML = '';
+            
+            if (ideasFiltradasBiblioteca.length === 0) {
+                const totalCerradas = ideas.filter(i => i.estatus === 'Cerrado').length;
+                if (totalCerradas === 0) {
+                    mensajeVacioBiblioteca.textContent = 'No hay ideas cerradas disponibles en la biblioteca';
+                } else {
+                    mensajeVacioBiblioteca.textContent = 'No se encontraron resultados con los filtros aplicados';
+                }
+                mensajeVacioBiblioteca.classList.add('visible');
+                return;
+            }
+            
+            mensajeVacioBiblioteca.classList.remove('visible');
+            
+            ideasFiltradasBiblioteca.forEach(idea => {
+                const tr = document.createElement('tr');
+                
+                const estatusClass = idea.estatus.toLowerCase().replace(' ', '-');
+                
+                const documentosHtml = idea.archivos.length > 0 
+                    ? idea.archivos.map((archivo, index) => `
+                        <div class="documento-item">
+                            <span>📄</span>
+                            <span style="color: #666;">${archivo.name}</span>
+                        </div>
+                    `).join('')
+                    : '<span style="color: #999;">Sin documentos</span>';
+                
+                const estatusEmoji = '🔴';
+                
+                tr.innerHTML = `
+                    <td>${idea.fecha}</td>
+                    <td><strong>${idea.codigo}</strong></td>
+                    <td>${idea.colaborador}</td>
+                    <td>${idea.area}</td>
+                    <td>${idea.puesto}</td>
+                    <td>${idea.fuenteGeneracion}</td>
+                    <td class="descripcion-col">${idea.descripcionIdea}</td>
+                    <td class="situacion-col">${idea.situacionActual}</td>
+                    <td>${idea.impacto}</td>
+                    <td><span class="estatus-badge estatus-${estatusClass}">${estatusEmoji} ${idea.estatus}</span></td>
+                    <td><div class="documentos-lista">${documentosHtml}</div></td>
+                    <td>
+                        <div class="opciones-grupo">
+                            <button class="btn-opcion" style="background: #607d8b;" onclick="visualizarIdea(${idea.id})">  ️ Visualizar</button>
+                        </div>
+                    </td>
+                `;
+                
+                tablaIdeasBibliotecaBody.appendChild(tr);
+            });
+        }
+
+        function actualizarContadorBiblioteca() {
+            const totalCerradas = ideas.filter(i => i.estatus === 'Cerrado').length;
+            const mostrados = ideasFiltradasBiblioteca.length;
+            contadorRegistrosBiblioteca.innerHTML = `Mostrando <strong>${mostrados}</strong> de <strong>${totalCerradas}</strong> ideas cerradas`;
+        }
+
+        // Event listeners para filtros de Seguimiento
+        filtroBusquedaPorSeguimiento.addEventListener('change', aplicarFiltrosSeguimiento);
+        filtroBusquedaSeguimiento.addEventListener('input', aplicarFiltrosSeguimiento);
+        filtroEstatusSeguimiento.addEventListener('change', aplicarFiltrosSeguimiento);
+        filtroEstatusImplementacion.addEventListener('change', aplicarFiltrosSeguimiento);
+
+        // Limpiar filtros (Seguimiento)
+        btnLimpiarFiltrosSeguimiento.addEventListener('click', function() {
+            filtroBusquedaPorSeguimiento.value = 'todas';
+            filtroBusquedaSeguimiento.value = '';
+            filtroEstatusSeguimiento.value = 'todos';
+            filtroEstatusImplementacion.value = 'todos';
+            aplicarFiltrosSeguimiento();
+        });
+
+        // Función para aplicar filtros en Seguimiento
+        function aplicarFiltrosSeguimiento() {
+            const busquedaPor = filtroBusquedaPorSeguimiento.value;
+            const textoBusqueda = filtroBusquedaSeguimiento.value.toLowerCase().trim();
+            const estatus = filtroEstatusSeguimiento.value;
+            
+            ideasFiltradasSeguimiento = ideas.filter(idea => {
+                // Filtro de búsqueda
+                let cumpleBusqueda = true;
+                if (textoBusqueda) {
+                    if (busquedaPor === 'todas') {
+                        cumpleBusqueda = 
+                            idea.codigo.toLowerCase().includes(textoBusqueda) ||
+                            idea.colaborador.toLowerCase().includes(textoBusqueda) ||
+                            idea.area.toLowerCase().includes(textoBusqueda) ||
+                            idea.puesto.toLowerCase().includes(textoBusqueda) ||
+                            idea.fuenteGeneracion.toLowerCase().includes(textoBusqueda) ||
+                            idea.descripcionIdea.toLowerCase().includes(textoBusqueda) ||
+                            idea.impacto.toLowerCase().includes(textoBusqueda);
+                    } else {
+                        cumpleBusqueda = idea[busquedaPor].toLowerCase().includes(textoBusqueda);
+                    }
+                }
+                
+                // Filtro de estatus
+                const cumpleEstatus = estatus === 'todos' || idea.estatus === estatus;
+                
+                return cumpleBusqueda && cumpleEstatus;
+            });
+            
+            actualizarTablaSeguimiento();
+            actualizarContadorSeguimiento();
+        }
+
+        function actualizarTablaSeguimiento() {
+            tablaSeguimientoBody.innerHTML = '';
+            
+            if (ideasFiltradasSeguimiento.length === 0) {
+                if (ideas.length === 0) {
+                    mensajeVacioSeguimiento.textContent = 'No hay ideas en seguimiento aún';
+                } else {
+                    mensajeVacioSeguimiento.textContent = 'No se encontraron resultados con los filtros aplicados';
+                }
+                mensajeVacioSeguimiento.classList.add('visible');
+                return;
+            }
+            
+            mensajeVacioSeguimiento.classList.remove('visible');
+            
+            ideasFiltradasSeguimiento.forEach(idea => {
+                const tr = document.createElement('tr');
+                
+                const estatusClass = idea.estatus.toLowerCase().replace(' ', '-');
+                const estatusEmoji = idea.estatus === 'Abierto' ? '🟢' : '🔴';
+                const comentario = idea.comentario || '';
+                
+                tr.innerHTML = `
+                    <td><strong>${idea.codigo}</strong></td>
+                    <td>${idea.colaborador}</td>
+                    <td>-</td>
+                    <td>${idea.impacto}</td>
+                    <td><span class="estatus-badge estatus-${estatusClass}">${estatusEmoji} ${idea.estatus}</span></td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>
+                        <textarea 
+                            class="comentario-editable" 
+                            placeholder="Escribe un comentario..."
+                            onblur="guardarComentario(${idea.id}, this)"
+                        >${comentario}</textarea>
+                    </td>
+                    <td>
+                        <div class="opciones-grupo">
+                            <button class="btn-opcion" style="background: #1a237e;" onclick="abrirSeguimiento(${idea.id})">📊 Seguimiento</button>
+                        </div>
+                    </td>
+                `;
+                
+                tablaSeguimientoBody.appendChild(tr);
+            });
+        }
+
+        function actualizarContadorSeguimiento() {
+            const total = ideas.length;
+            const mostrados = ideasFiltradasSeguimiento.length;
+            contadorRegistrosSeguimiento.innerHTML = `Mostrando <strong>${mostrados}</strong> de <strong>${total}</strong> registros`;
+        }
+
+        // Función para guardar comentario
+        function guardarComentario(ideaId, textarea) {
+            const idea = ideas.find(i => i.id === ideaId);
+            if (!idea) return;
+            
+            idea.comentario = textarea.value;
+            
+            // Efecto visual de guardado
+            textarea.classList.add('comentario-guardado');
+            setTimeout(() => {
+                textarea.classList.remove('comentario-guardado');
+            }, 500);
+            
+            mostrarMensaje('💬 Comentario guardado exitosamente');
+        }
+
+        // Inicializar
+        cargarPersonalizacion();
+        ideasFiltradas = ideas;
+        ideasFiltradasBiblioteca = ideas.filter(i => i.estatus === 'Cerrado');
+        ideasFiltradasSeguimiento = ideas;
+        ideasAprobadasFiltradas = ideas.filter(i => i.seguimiento && i.seguimiento.aprobado);
+        actualizarTabla();
+        actualizarContador();
+        actualizarContadorUsuarios();
+        actualizarTablaSeguimiento();
+        actualizarContadorSeguimiento();
+        actualizarTablaAcciones();
+        actualizarContadorAcciones();
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c0fe3de02baac68',t:'MTc2ODkyNTkzMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
